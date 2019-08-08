@@ -35,7 +35,7 @@ plt.rcParams['figure.subplot.hspace'] = 0.3  # 図と図の幅
 plt.rcParams['figure.subplot.wspace'] = 0.3  # 図と図の幅
 
 
-class ResearchTools(object):
+class PlotTools(object):
     def __init__(self, y, fs=44100, fft_N=1024, stft_N=256, **kwargs):
 
         def completion_0(data_array):
@@ -81,6 +81,7 @@ class ResearchTools(object):
             name=window_name, N=self.stft_N)
 
         self.Y = np.fft.fft(self.fft_window * self.y)  # default
+        self.samples = np.arange(self.start_pos, fft_N+self.start_pos)
         self.t = np.arange(
             self.start_sec, (fft_N + self.start_pos) * self.dt, self.dt)
 
@@ -130,10 +131,21 @@ class ResearchTools(object):
         ax1 = fig.add_subplot(111)
         ax1.plot(self.t, self.y, "-", markersize=1)
         ax1.axis([self.start_sec, (self.fft_N + self.start_pos) *
-                  self.dt, np.amin(self.y)-10, np.amax(self.y)+10])
+                  self.dt, np.amin(self.y)*(-1.1), np.amax(self.y)*1.1])
         ax1.set_xlabel("Time [sec]")
         ax1.set_ylabel("Amplitude")
         ax1.set_title("Amplitude - Time")
+        plt.show()
+
+    def plot_y_sample(self):
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+        ax1.plot(self.samples, self.y, "-", markersize=1)
+        ax1.axis([self.start_pos, self.fft_N + self.start_pos,
+                  np.amin(self.y)*1.1, np.amax(self.y)*1.1])
+        ax1.set_xlabel("Sample")
+        ax1.set_ylabel("Amplitude")
+        ax1.set_title("Amplitude - Sample")
         plt.show()
 
     def plot_freq_analysis_log(self):
@@ -287,7 +299,6 @@ class ResearchTools(object):
         pp2.set_label("power")
 
         plt.show()
-    
 
     def plot_all(self):
         self.plot_y_time()

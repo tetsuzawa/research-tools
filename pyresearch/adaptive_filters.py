@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+import warnings
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,7 +14,7 @@ def nlms_agm_on(alpha, update_count, threshold, d, adf_N):
     """
     Update formula
     _________________
-        w_{k+1} = w_k + mu * e_k * x_k
+        w_{k+1} = w_k + alpha * e_k * x_k / ||x||^2 + 1e-8
 
     Parameters
     -----------------
@@ -35,10 +38,11 @@ def nlms_agm_on(alpha, update_count, threshold, d, adf_N):
         raise StepSizeError
 
     def nlms_agm_adapter(sample_num):
+
         w = np.random.rand(adf_N, 1)  # initial cofficient (data_len, 1)
         for i in np.arange(1, update_count+1):
             y = np.dot(w.T, x)  # find dot product of cofficients and numbers
-            e = d[sample_num, 0] - y  # find error
+            e = d_part[sample_num, 0] - y  # find error
             # update w -> array(e)
             w = w + alpha * np.array(e) * x / x_norm_squ
             if(abs(e) < threshold):  # error threshold
@@ -56,20 +60,31 @@ def nlms_agm_on(alpha, update_count, threshold, d, adf_N):
     # find norm square
     x_norm_squ = np.dot(x.T, x)
 
+    # devision number
+    dev_num = len(d) // adf_N
+    if len(d) % adf_N != 0:
+        sample_len = dev_num*adf_N
+        warnings.warn(
+            f"the data was not divisible by adf_N, the last part was truncated. \
+              original sample : {len(d)} > {sample_len} : truncated sample")
+        d = d[:dev_num*adf_N]
+    d_dev = np.split(d, dev_num)
+
     # ADF : Adaptive Filter
     ADF_out = []  # Define output list
-    for j in np.arange(0, adf_N, 1):
-        nend_con = float(nlms_agm_adapter(sample_num=j))
-        ADF_out.append(nend_con)
+    for d_part in d_dev:
+        for j in np.arange(0, adf_N, 1):
+            end_con = float(nlms_agm_adapter(sample_num=j))
+            ADF_out.append(end_con)
 
     ADF_out_arr = np.array(ADF_out)
     ADF_out_nd = ADF_out_arr.reshape(len(ADF_out_arr), 1)
 
     # _plot_command_############################
     plt.figure(facecolor='w')  # Backgroundcolor_white
-    plt.plot(d, label="Desired Signal")
-    plt.plot(ADF_out_nd, "r--", label="NLMS_online")
-    plt.plot(d-ADF_out_nd, "g--", label="NLMS_online_filterd")
+    plt.plot(d, "c--", alpha=0.5, label="Desired Signal")
+    plt.plot(ADF_out_nd, "r--", alpha=0.5, label="NLMS_online")
+    plt.plot(d-ADF_out_nd, "g--", alpha=0.5, label="NLMS_online_filterd")
     plt.grid()
     plt.legend()
     plt.title('NLMS Algorithm Online')
@@ -79,3 +94,10 @@ def nlms_agm_on(alpha, update_count, threshold, d, adf_N):
         plt.close('all')
 
     return ADF_out_nd
+
+
+if __name__ == "__main__":
+    adf_N = 256
+    # Make desired value
+    d = np.random.rand(1347, 1)
+    nlms_agm_on(alpha=1.3, update_count=20, threshold=0.01, d=d, adf_N=adf_N)
