@@ -310,7 +310,6 @@ class PlotTools(object):
 
 
 class WindowNameNotFoundError(Exception):
-    """
-    Window name not found
+    """Window name not found
     """
     print("Window Not Found")
