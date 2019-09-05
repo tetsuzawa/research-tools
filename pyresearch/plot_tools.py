@@ -12,6 +12,7 @@ import numpy as np
 # import wave
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
+
 # import matplotlib.ticker as ticker
 # from matplotlib.backends.backend_pdf import PdfPages
 # from collections import OrderedDict
@@ -63,7 +64,7 @@ class PlotTools(object):
         self.fs = fs  # Sampling frequency
         self.dt = 1 / fs  # Sampling interval
         # Start position to analyse
-        self.start_pos = int(self.start_sec/self.dt)
+        self.start_pos = int(self.start_sec / self.dt)
 
         self.fft_N = fft_N  # FFT length
         self.stft_N = stft_N  # STFT length
@@ -81,7 +82,7 @@ class PlotTools(object):
             name=window_name, N=self.stft_N)
 
         self.Y = np.fft.fft(self.fft_window * self.y)  # default
-        self.samples = np.arange(self.start_pos, fft_N+self.start_pos)
+        self.samples = np.arange(self.start_pos, fft_N + self.start_pos)
         self.t = np.arange(
             self.start_sec, (fft_N + self.start_pos) * self.dt, self.dt)
 
@@ -94,11 +95,11 @@ class PlotTools(object):
         self.amp_spectrum = np.abs(self.Y) / fft_N * 2
         self.amp_spectrum[0] = self.amp_spectrum[0] / 2
         self.gain_spectrum = 20 * \
-            np.log10(self.amp_spectrum / np.max(self.amp_spectrum))
+                             np.log10(self.amp_spectrum / np.max(self.amp_spectrum))
         self.phase_spectrum = np.rad2deg(np.angle(self.Y))
         self.power_spectrum = self.amp_spectrum ** 2
         self.power_gain_spectrum = 10 * \
-            np.log10(self.power_spectrum / np.max(self.power_spectrum))
+                                   np.log10(self.power_spectrum / np.max(self.power_spectrum))
         self.acf = np.real(np.fft.ifft(
             self.power_spectrum / np.amax(self.power_spectrum)))
         self.acf = self.acf / np.amax(self.acf)
@@ -131,7 +132,7 @@ class PlotTools(object):
         ax1 = fig.add_subplot(111)
         ax1.plot(self.t, self.y, "-", markersize=1)
         ax1.axis([self.start_sec, (self.fft_N + self.start_pos) *
-                  self.dt, np.amin(self.y)*(-1.1), np.amax(self.y)*1.1])
+                  self.dt, np.amin(self.y) * (-1.1), np.amax(self.y) * 1.1])
         ax1.set_xlabel("Time [sec]")
         ax1.set_ylabel("Amplitude")
         ax1.set_title("Amplitude - Time")
@@ -142,7 +143,7 @@ class PlotTools(object):
         ax1 = fig.add_subplot(111)
         ax1.plot(self.samples, self.y, "-", markersize=1)
         ax1.axis([self.start_pos, self.fft_N + self.start_pos,
-                  np.amin(self.y)*1.1, np.amax(self.y)*1.1])
+                  np.amin(self.y) * 1.1, np.amax(self.y) * 1.1])
         ax1.set_xlabel("Sample")
         ax1.set_ylabel("Amplitude")
         ax1.set_title("Amplitude - Sample")
@@ -152,8 +153,8 @@ class PlotTools(object):
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
         ax1.set_xscale('log')
-        ax1.axis([10, self.fs/2, np.amin(self.gain_spectrum),
-                  np.amax(self.gain_spectrum)+10])
+        ax1.axis([10, self.fs / 2, np.amin(self.gain_spectrum),
+                  np.amax(self.gain_spectrum) + 10])
         ax1.plot(self.freq_list, self.gain_spectrum, '-', markersize=1)
         ax1.set_xlabel("Frequency [Hz]")
         ax1.set_ylabel("Amplitude [dB]")
@@ -161,7 +162,7 @@ class PlotTools(object):
 
         ax2 = fig.add_subplot(212)
         ax2.set_xscale('log')
-        ax2.axis([10, self.fs/2, -180, 180])
+        ax2.axis([10, self.fs / 2, -180, 180])
         ax2.set_yticks(np.linspace(-180, 180, 9))
         ax2.plot(self.freq_list, self.phase_spectrum, '-', markersize=1)
         ax2.set_xlabel("Frequency [Hz]")
@@ -173,15 +174,15 @@ class PlotTools(object):
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
         ax1.plot(self.t, self.y, "-", markersize=1)
-        ax1.axis([self.start_sec, (self.fft_N+self.start_pos) *
-                  self.dt, np.amin(self.y)*1.2, np.amax(self.y)*1.2])
+        ax1.axis([self.start_sec, (self.fft_N + self.start_pos) *
+                  self.dt, np.amin(self.y) * 1.2, np.amax(self.y) * 1.2])
         ax1.set_xlabel("Time [sec]")
         ax1.set_ylabel("Amplitude")
         ax1.set_title("Amplitude - Time")
 
         ax2 = fig.add_subplot(212)
-        ax2.axis([10, self.fs/2, np.amin(self.amp_spectrum)
-                  * 0.9, np.amax(self.amp_spectrum)*1.1])
+        ax2.axis([10, self.fs / 2, np.amin(self.amp_spectrum)
+                  * 0.9, np.amax(self.amp_spectrum) * 1.1])
         ax2.plot(self.freq_list, self.amp_spectrum, '-', markersize=1)
         ax2.set_xlabel("Frequency [Hz]")
         ax2.set_ylabel("Amplitude")
@@ -192,8 +193,8 @@ class PlotTools(object):
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
         ax1.set_xscale('log')
-        ax1.axis([10, self.fs/2, np.amin(self.power_gain_spectrum),
-                  np.amax(self.power_gain_spectrum)+10])
+        ax1.axis([10, self.fs / 2, np.amin(self.power_gain_spectrum),
+                  np.amax(self.power_gain_spectrum) + 10])
         ax1.plot(self.freq_list, self.gain_spectrum, '-', markersize=1)
         ax1.set_xlabel("Frequency [Hz]")
         ax1.set_ylabel("power")
@@ -203,8 +204,8 @@ class PlotTools(object):
     def plot_acf(self):
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
-        ax1.axis([-self.fft_N/10, self.fft_N/2, np.amin(self.acf)*1.1,
-                  np.amax(self.acf)*1.1])
+        ax1.axis([-self.fft_N / 10, self.fft_N / 2, np.amin(self.acf) * 1.1,
+                  np.amax(self.acf) * 1.1])
         ax1.plot(list(range(self.fft_N)), self.acf, '-', markersize=1)
         ax1.set_xlabel("sample number")
         ax1.set_ylabel("Correlation")
@@ -236,7 +237,7 @@ class PlotTools(object):
 
         for fft_index in range(len(time_ruler)):
             # Frame cut out
-            frame = self.y[pos:pos+self.stft_N]
+            frame = self.y[pos:pos + self.stft_N]
             # Frame cut out determination
             if len(frame) == self.stft_N:
                 # Multiply window function
@@ -254,8 +255,8 @@ class PlotTools(object):
                 fft_data = 10 * np.log10(np.abs(fft_result) ** 2)
                 # Assign to spec
                 for i in range(len(spec[fft_index])):
-                    spec[fft_index][-i-1] = fft_data[i]
-                    st_acf[fft_index][-i-1] = acf[i]
+                    spec[fft_index][-i - 1] = fft_data[i]
+                    st_acf[fft_index][-i - 1] = acf[i]
 
                 # Shift the window and execute the next frame.
                 pos += (self.stft_N - OVERLAP)
@@ -264,7 +265,7 @@ class PlotTools(object):
         fig = plt.figure()
         ax1 = fig.add_subplot(111)
         im = ax1.imshow(spec.T, extent=[0, time_of_file,
-                                        0, self.fs/2],
+                                        0, self.fs / 2],
                         aspect="auto",
                         cmap="inferno",
                         interpolation="nearest",
@@ -281,7 +282,7 @@ class PlotTools(object):
         fig = plt.figure()
         ax2 = fig.add_subplot(111)
         im2 = ax2.imshow(st_acf.T, extent=[0, time_of_file,
-                                           0, self.fs/2],
+                                           0, self.fs / 2],
                          aspect="auto",
                          cmap="inferno",
                          interpolation="nearest",
@@ -291,7 +292,6 @@ class PlotTools(object):
         ax2.set_ylabel("frequency[Hz]")
         ax2.set_title("Short Time Autocorrelation Function")
 
-        # ここがポイント！
         # mappable0 = ax1.pcolormesh(X,Y,z, cmap='coolwarm',
         # norm=Normalize(vmin=-4, vmax=4))
         pp2 = fig.colorbar(im2, ax=ax2, orientation="vertical")
@@ -302,6 +302,7 @@ class PlotTools(object):
 
     def plot_all(self):
         self.plot_y_time()
+        self.plot_y_sample()
         self.plot_freq_analysis()
         self.plot_freq_analysis_log()
         self.plot_power_gain_spectrum
