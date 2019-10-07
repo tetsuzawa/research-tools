@@ -4,7 +4,7 @@ import numpy as np
 import wave
 
 
-class wave_process():
+class WaveHandler(object):
 
     def __init__(self, filename=None):
         self.ch = 1
