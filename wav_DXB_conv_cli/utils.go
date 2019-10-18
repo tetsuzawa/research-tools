@@ -6,22 +6,126 @@ import (
 	"math"
 )
 
-func float64ToBytes(f float64) []byte {
+func Float32ToBytes(f float32) []byte {
+	bits := math.Float32bits(f)
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint32(b, bits)
+	return b
+}
+
+func BytesToFloat32(b []byte) float32 {
+	ui32 := binary.LittleEndian.Uint32(b)
+	f := math.Float32frombits(ui32)
+	return f
+}
+
+func Float64ToBytes(f float64) []byte {
 	bits := math.Float64bits(f)
 	b := make([]byte, 8)
 	binary.LittleEndian.PutUint64(b, bits)
 	return b
 }
 
-func bytesToFloat64(b []byte) float64 {
+func BytesToFloat64(b []byte) float64 {
 	ui64 := binary.LittleEndian.Uint64(b)
 	f := math.Float64frombits(ui64)
 	return f
 }
 
-func bytesToUint16(b []byte) uint16 {
+
+func Uint16ToBytes(ui uint16) []byte{
+	b := make([]byte, 2)
+	binary.LittleEndian.PutUint16(b, ui)
+	return b
+}
+
+func BytesToUint16(b []byte) uint16 {
 	ui := binary.LittleEndian.Uint16(b)
 	return ui
+}
+
+func Uint32ToBytes(ui uint32) []byte{
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint32(b, ui)
+	return b
+}
+
+func BytesToUint32(b []byte) uint32 {
+	ui := binary.LittleEndian.Uint32(b)
+	return ui
+}
+
+func Uint64ToBytes(ui uint64) []byte{
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint64(b, ui)
+	return b
+}
+
+func BytesToUint64(b []byte) uint64 {
+	ui := binary.LittleEndian.Uint64(b)
+	return ui
+}
+
+////////////////////////////////////
+
+func Int16ToUint16(i int16) uint16 {
+	var ui uint16
+	if 0 < i {
+		ui = uint16(i)
+	} else {
+		ui = (^uint16(-i) + 1)
+	}
+	return ui
+}
+
+func Uint16ToInt16(ui uint16) int16 {
+	var i int16
+	if ui > math.MaxInt16 {
+		i = int16(ui - math.MaxUint16 - 1)
+	} else {
+		i = int16(ui)
+	}
+	return i
+}
+
+func Int32ToUint32(i int32) uint32 {
+	var ui uint32
+	if 0 < i {
+		ui = uint32(i)
+	} else {
+		ui = (^uint32(-i) + 1)
+	}
+	return ui
+}
+
+func Uint32ToInt32(ui uint32) int32 {
+	var i int32
+	if ui > math.MaxInt32 {
+		i = int32(ui - math.MaxUint32 - 1)
+	} else {
+		i = int32(ui)
+	}
+	return i
+}
+
+func Int64ToUint64(i int64) uint64 {
+	var ui uint64
+	if 0 < i {
+		ui = uint64(i)
+	} else {
+		ui = (^uint64(-i) + 1)
+	}
+	return ui
+}
+
+func Uint64ToInt64(ui uint64) int64 {
+	var i int64
+	if ui > math.MaxInt64 {
+		i = int64(ui - math.MaxUint64 - 1)
+	} else {
+		i = int64(ui)
+	}
+	return i
 }
 
 func float32sToBytes(fs []float32) []byte {
@@ -47,8 +151,6 @@ func bytesToFloat64s(bs []byte) []float64 {
 	}
 	return fs
 }
-
-
 
 func NormalizeFloat32s(fs []float32) []float32 {
 	fs64 := make([]float64, len(fs))
@@ -128,26 +230,6 @@ func Uint2bytes(i uint64, size int) []byte {
 	return bytes[8-size : 8]
 }
 
-func Int16ToUint16(i int16) uint16 {
-	var ui uint16
-	if 0 < i {
-		ui = uint16(i)
-	} else {
-		ui = (^uint16(-i) + 1)
-	}
-	return ui
-}
-
-func Uint16ToInt16(ui uint16) int16 {
-	var i int16
-	if ui > 32768 {
-		i = int16(ui - math.MaxUint16 - 1)
-	} else {
-		i = int16(ui)
-	}
-	return i
-}
-
 func bytesToInt16(b []byte) int16 {
 	ui := binary.LittleEndian.Uint16(b)
 	i := Uint16ToInt16(ui)
@@ -160,7 +242,7 @@ func bytesToInt16s(bs []byte) []int16 {
 	for i := 0; i < len(bs)/2; i++ {
 		idx = i * 2
 		//bs[idx] sonomama
-		ui := binary.LittleEndian.Uint16(bs[idx:idx+2])
+		ui := binary.LittleEndian.Uint16(bs[idx : idx+2])
 		in := Uint16ToInt16(ui)
 		//f := math.Float64frombits(ui)
 		is[i] = in
