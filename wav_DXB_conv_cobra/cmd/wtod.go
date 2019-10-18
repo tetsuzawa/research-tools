@@ -13,7 +13,8 @@ import (
 )
 
 type Options struct {
-	Ch int `validate:"min=1,max=10"`
+	Ch      int    `validate:"min=1,max=10"`
+	OutName string `validate:"excludesall=!&%*;:."`
 }
 
 var (
@@ -34,6 +35,7 @@ func NewCmdWtoD() *cobra.Command {
 		Run: wtod,
 	}
 	cmd.Flags().IntVarP(&o.Ch, "int", "c", 1, "ch option")
+	cmd.Flags().StringVarP(&o.OutName, "outname", "o", "", "outname option")
 
 	return cmd
 }
@@ -49,7 +51,14 @@ func wtod(cmd *cobra.Command, args []string) {
 
 	fileName := args[0]
 	nameParts := strings.Split(fileName, ".")
-	name, ex := nameParts[0], nameParts[1]
+
+	var name string
+	if o.OutName != "" {
+		name = o.OutName
+	} else {
+		name = nameParts[0]
+	}
+	ex := nameParts[1]
 
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -76,9 +85,11 @@ func wtod(cmd *cobra.Command, args []string) {
 			cmd.PrintErrln(err)
 			os.Exit(4)
 		}
+
 		cmd.Println("name: ", name)
 		cmd.Println("type: ", reflect.TypeOf(data))
 		cmd.Println("ex: ", ex)
+
 		if value, ok := data.([]int16); ok {
 
 			fw, err := os.Create(name + ".DSB")
@@ -89,16 +100,14 @@ func wtod(cmd *cobra.Command, args []string) {
 			cmd.Println("len of value: ", len(value))
 			defer fw.Close()
 
+			b := make([]byte, 2)
 			buf := make([]byte, 0)
-			//buf := make([]byte, 2*len(value))
 
 			for i, v := range value {
 				cmd.Printf("working... %d%%\r", (i+1)*100/len(value))
 
-				b := make([]byte, 2)
 				ui := converter.Int16ToUint16(v)
 				binary.LittleEndian.PutUint16(b, ui)
-				//buf[i*2 : i*2+2] = b...
 				buf = append(buf, b...)
 			}
 			_, err = fw.Write(buf)
@@ -106,6 +115,9 @@ func wtod(cmd *cobra.Command, args []string) {
 				cmd.PrintErrln(err)
 				os.Exit(3)
 			}
+		} else {
+			cmd.PrintErrln(err)
+			os.Exit(2)
 		}
 		cmd.Printf("\n\n")
 		cmd.Println("end!!")
