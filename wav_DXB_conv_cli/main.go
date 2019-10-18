@@ -26,23 +26,33 @@ func main() {
 		cli.IntFlag{
 			Name:  "channel, c",
 			Usage: "output channel num",
-			//Usage: "convert .wav to .DXB",
+			Value: 1,
 		},
 		cli.StringFlag{
-			Name: "outname, o",
+			Name:  "outname, o",
 			Usage: "designate output file name",
 		},
 	}
 }
 
 func action(ctx *cli.Context) error {
+	fmt.Println(ctx)
+	fmt.Println(ctx.Int("c"), ctx.String("o"), ctx.String("outname"))
 	if ctx.Args().Get(0) == "" {
 		return cli.NewExitError("Too few arguments. Need input file name", 2)
 	}
 
 	fileName := ctx.Args().Get(0)
+	fmt.Println("filename: ", fileName)
 	nameParts := strings.Split(fileName, ".")
-	name, ex := nameParts[0], nameParts[1]
+	var name string
+	fmt.Println("ctx: ", ctx.Int("channel"), ctx.String("outname"))
+	if ctx.String("o") != "" {
+		name = ctx.String("o")
+	} else {
+		name = nameParts[0]
+	}
+	ex := nameParts[1]
 
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -50,10 +60,9 @@ func action(ctx *cli.Context) error {
 	}
 	defer f.Close()
 
-
 	switch ex {
 	case "wav":
-		return wtod(f, name)
+		return wtod(ctx, f, name)
 
 	case "DSB":
 		buff, err := ioutil.ReadAll(f)

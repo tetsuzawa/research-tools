@@ -11,8 +11,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func wtod(f *os.File, name string) error {
-
+func wtod(ctx *cli.Context, f *os.File, name string) error {
 	w, err := wav.NewReader(f)
 	if err != nil {
 		return cli.NewExitError(err, 3)
