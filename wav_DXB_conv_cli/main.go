@@ -56,7 +56,7 @@ func action(ctx *cli.Context) error {
 		if err != nil {
 			return cli.NewExitError(err, 3)
 		}
-		data, err = w.ReadSamples(int(w.GetSubChunkSize())/int(w.GetNumChannels()))
+		data, err = w.ReadSamples(int(w.GetSubChunkSize()) / int(w.GetNumChannels()))
 		//sc := w.GetSubChunkSize()
 		//fmt.Println(sc)
 		//data, err = w.ReadSamples(1024)
@@ -78,18 +78,25 @@ func action(ctx *cli.Context) error {
 			}
 			fmt.Println("len of value: ", len(value))
 			defer fw.Close()
-			//for i := 0; i < len(value); i++ {
-			for _, v := range value{
-				//idx := i * 2
-				buf := make([]byte, 2)
+
+			buf := make([]byte, 0)
+			//buf := make([]byte, 2*len(value))
+
+			for i, v := range value {
+				fmt.Printf("working... %d%%\r", (i+1)*100/len(value))
+
+				b := make([]byte, 2)
 				ui := Int16ToUint16(v)
-				binary.LittleEndian.PutUint16(buf, ui)
-				_, err := fw.Write(buf)
-				if err != nil {
-					return cli.NewExitError(err, 3)
-				}
+				binary.LittleEndian.PutUint16(b, ui)
+				//buf[i*2 : i*2+2] = b...
+				buf = append(buf, b...)
+			}
+			_, err = fw.Write(buf)
+			if err != nil {
+				return cli.NewExitError(err, 3)
 			}
 		}
+		fmt.Printf("\n\n")
 		fmt.Println("end!!")
 
 	case "DSB":
