@@ -16,6 +16,7 @@ func NewCmdRoot() *cobra.Command {
 		Short: "WDConv is a .wav .DxB converter.",
 		Long: `A .wav .DxB converter built with Golang.
 This app convert .wav file to .DXB file or .DXB to .wav file`,
+		Version: "0.0.1",
 	}
 	cobra.OnInitialize(initConfig)
 
