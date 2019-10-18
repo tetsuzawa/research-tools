@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -34,8 +35,8 @@ func NewCmdWtoD() *cobra.Command {
 		//},
 		Run: wtod,
 	}
-	cmd.Flags().IntVarP(&o.Ch, "int", "c", 1, "ch option")
-	cmd.Flags().StringVarP(&o.OutName, "outname", "o", "", "outname option")
+	cmd.Flags().IntVarP(&o.Ch, "channel", "c", 1, "ch [num]")
+	cmd.Flags().StringVarP(&o.OutName, "outname", "o", "", "outname [name]")
 
 	return cmd
 }
@@ -53,6 +54,7 @@ func wtod(cmd *cobra.Command, args []string) {
 	nameParts := strings.Split(fileName, ".")
 
 	var name string
+	fmt.Println("flags: ",o.Ch,o.OutName)
 	if o.OutName != "" {
 		name = o.OutName
 	} else {

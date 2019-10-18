@@ -36,8 +36,6 @@ func main() {
 }
 
 func action(ctx *cli.Context) error {
-	fmt.Println(ctx)
-	fmt.Println(ctx.Int("c"), ctx.String("o"), ctx.String("outname"))
 	if ctx.Args().Get(0) == "" {
 		return cli.NewExitError("Too few arguments. Need input file name", 2)
 	}
