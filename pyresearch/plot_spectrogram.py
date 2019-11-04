@@ -10,19 +10,17 @@ from scipy import fromstring, int16, frombuffer
 import wave_process
 import plot_tool
 
-def main():
 
+def main():
     if len(sys.argv) != 4:
         print("usage: python3.7 ahe.ph [XXX.DDB or .DSB or .wav] [fft_length] [sampling_freqency]")
         sys.exit()
-    
 
     audiofile = sys.argv[1]
     N = int(sys.argv[2])
     fs = int(sys.argv[3])
     name, ext = os.path.splitext(audiofile)
     channels = 1
-
 
     if ext == ".DDB":
         strs = open_file(audiofile)
@@ -35,14 +33,8 @@ def main():
         data = audiodata.data
         channels = audiodata.ch
 
-
-
     plot_tool.spectrogram(N=N, y=data, fs=fs, window_func_name="hamming")
-
-
 
 
 if __name__ == '__main__':
     main()
-
-

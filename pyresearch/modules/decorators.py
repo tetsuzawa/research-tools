@@ -1,6 +1,7 @@
 from functools import wraps
 import time
 
+
 def stop_watch(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -14,6 +15,7 @@ def stop_watch(func):
             f"{elapsed_time}[sec] elapsed to execute the function:{func.__name__}"
         )
         return result
+
     return wrapper
 
 
@@ -26,4 +28,5 @@ def print_info(func):
         result = func(*args, **kwargs)
         print("result:", result)
         return result
+
     return wrapper

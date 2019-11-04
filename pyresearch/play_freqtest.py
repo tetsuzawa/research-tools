@@ -1,7 +1,10 @@
-import math
-import numpy as np
-import pyaudio
+# /usr/bin/python
+# coding: utf-8
+import sys
 import struct
+
+import pyaudio
+import numpy as np
 
 
 # classとか関数書く
@@ -18,15 +21,14 @@ def play(stream, data):  # 再生用関数、ストリームと波形データ�
         buffer = data[sp:sp + chunk]
 
 
-# def createData(freqList = [440], start_pos=0): #オシレーター
-def createData(freqList=[800], start_pos=0):  # オシレーター
+def create_data(freq_list=[800], start_pos=0):  # オシレーター
     data = []
-    amp = 1.0 / len(freqList)  # 使用時は波形データにampを乗算する
+    amp = 1.0 / len(freq_list)  # 使用時は波形データにampを乗算する
 
     end_pos = start_pos + 0.05 * 44100
     for n in np.arange(start_pos, end_pos):
         s = 0.0  # 波形データをゼロクリア
-        for f in freqList:
+        for f in freq_list:
             s += amp * np.sin(2 * np.pi * f * n / 44100)
         # 振幅が大きい時はクリッピング
         if s > 1.0:  s = 1.0
@@ -45,18 +47,19 @@ if __name__ == '__main__':
     # ストリームを開く
     p = pyaudio.PyAudio()
     stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, output=1)
-    freqList = [80, 30, 200]
-
-    # メインループ入るよ
+    freq_list = []
+    for i, freq in enumerate(sys.argv):
+        if i == 0:
+            continue
+        freq_list.append(freq)
 
     pos = 0
     try:
         while True:
-            data, pos = createData(start_pos=pos, freqList=freqList)
+            data, pos = create_data(start_pos=pos, freq_list=freq_list)
             play(stream, data)
 
     except KeyboardInterrupt:
 
-        # ======================
         stream.close()
         p.terminate()
