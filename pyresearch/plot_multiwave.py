@@ -47,7 +47,7 @@ def main():
         # axf.grid()
         # axF.grid()
 
-        plt.plot(f, label=args[i + 1])
+        plt.plot(f, alpha=0.5, label=args[i + 1])
         plt.legend()
         plt.grid(True)
 
