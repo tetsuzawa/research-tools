@@ -4,55 +4,56 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"os"
+
+	"github.com/pkg/errors"
 	"github.com/takuyaohashi/go-wav"
 	"github.com/urfave/cli"
-	"os"
-	"strconv"
 )
 
-func wtod(ctx *cli.Context, f *os.File, name string) error {
+func wavToDSB(ctx *cli.Context, f *os.File, name string) error {
 	w, err := wav.NewReader(f)
 	if err != nil {
+		err = errors.Wrap(err, "error occurred while processing .wav file")
 		return cli.NewExitError(err, 3)
 	}
-
-	//var data interface{}
-	//data, err = w.ReadSamples(int(w.GetSubChunkSize()) / int(w.GetNumChannels()))
-	//if err != nil {
-	//	return cli.NewExitError(err, 3)
-	//}
-	//data, err := w.ReadSamples(int(w.GetSubChunkSize()) / (int(w.GetNumChannels()) * int(w.GetBitsPerSample())) * 8)
 
 	ch := int(w.GetNumChannels())
-	bps := int(w.GetBlockAlign())
-	//bps = 4
-	//bps * ch = 8
-	//omotteta bps * ch = 4
-	//bps / ch = 2
+	byteRate := int(w.GetBlockAlign())
+	bps := byteRate / ch
+	fs := int(w.GetSampleRate())
 
-	//data, err := w.ReadSamples(int(w.GetSubChunkSize()) / (bps * ch))
-	data, err := w.ReadSamples(int(w.GetSubChunkSize()) / bps)
+	if fs != 48000 || bps != 2 || w.GetAudioFormat().String() != "PCM" {
+		errMsg := fmt.Sprintf(`audio format error: wav format must be as follows.
+sample rate: want 48000 Hz, got %v Hz.
+sampling bit rate: want 16 bits per sample, got %v bits per sample.
+audio format: want PCM, got %v.`, fs, w.GetBitsPerSample(), w.GetAudioFormat())
+		return cli.NewExitError(errMsg, 3)
+	}
+
+	data, err := w.ReadSamples(int(w.GetSubChunkSize()) / byteRate * ch)
 	if err != nil {
+		err = errors.Wrap(err, "error occurred while processing .wav file")
 		return cli.NewExitError(err, 3)
 	}
 
-	//if reflect.TypeOf(data) != reflect.TypeOf([]int16{0,}) {
-	//	return cli.NewExitError(err, 4)
-	//}
 	value, ok := data.([]int16)
 	if !ok {
-		return cli.NewExitError("bits per sample is incorrect. need 16 bits per sample", 5)
+		err = errors.New("sampling bit rate is incorrect. need 16 bits per sample")
+		err = errors.Wrap(err, "error occurred while processing .wav file")
+		return cli.NewExitError(err, 3)
 	}
 
-	//b := make([]byte, 2)
-
 	iter := len(value) / ch
-	b := new(bytes.Buffer)
 	buf := make([]byte, iter*bps)
-	fmt.Println(bps)
 
+	var fw *os.File
 	for j := 0; j < ch; j++ {
-		fw, err := os.Create(fmt.Sprintf("%s_%s.DSB", name, strconv.Itoa(j)))
+		if ch == 1 {
+			fw, err = os.Create(fmt.Sprintf("%s.DSB", name))
+		} else {
+			fw, err = os.Create(fmt.Sprintf("%s_ch%d.DSB", name, j+1))
+		}
 		if err != nil {
 			return cli.NewExitError(err, 3)
 		}
@@ -60,19 +61,28 @@ func wtod(ctx *cli.Context, f *os.File, name string) error {
 
 		for i := 0; i < iter; i++ {
 			fmt.Printf("working... %d%%\r", (i+1)*100/iter)
+			b := new(bytes.Buffer)
 			err = binary.Write(b, binary.LittleEndian, value[ch*i+j])
 			if err != nil {
+				err = errors.Wrap(err, "internal error: error occurred while writing data to buffer")
 				return cli.NewExitError(err, 5)
 			}
-			copy(buf[bps*i:bps*i+bps], b.Bytes())
+			copy(buf[bps*i:bps*(i+1)], b.Bytes())
 		}
-
 		_, err = fw.Write(buf)
 		if err != nil {
+			err = errors.Wrap(err, "error occurred while writing data to .DSB file")
 			return cli.NewExitError(err, 3)
 		}
+
 	}
-	fmt.Printf("\n\n")
+	if ch == 1 {
+		fmt.Printf("\n\n%d file created as %s.DSB\n", ch, name)
+	} else {
+		fmt.Printf("\n\n%d files created as %s_chX.DSB\n", ch, name)
+	}
+
+	fmt.Printf("\n")
 	fmt.Println("end!!")
 
 	return nil
