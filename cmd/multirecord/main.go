@@ -55,6 +55,10 @@ func main() {
 			Value: "out_multirecord.wav",
 			Usage: "specify output path like as `-o /path/to/file`",
 		},
+		cli.BoolFlag{
+			Name:  "params, p",
+			Usage: "trace import statements",
+		},
 	}
 }
 
@@ -62,36 +66,46 @@ const (
 	FramesPerBuffer = 1024
 )
 
+var w1 *wav.Writer
+var RecordSeconds float64
+var NumChannels int
+var SampleRate int
+var BitsPerSample int
+var NumSamplesToWrite int
+var NumWritten int
+var err error
+
 func multiRecord(ctx *cli.Context) error {
 	if ctx.Args().Get(0) == "" {
 		return cli.NewExitError(`too few arguments. need recording duration.
-Usage: multirecord (-c num_ch -r sample_rate -b bits_per_sample -o /path/to/out.wav) 5`, 2)
+								Usage: multirecord (-c ch -r rate -b bits -o /path/to/out.wav) duration
+								`, 2)
 	}
 
 	name, ext := splitPathAndExt(ctx.String("o"))
 	if ext != ".wav" {
 		return cli.NewExitError(`incorrect file format. multirecord saves audio as .wav file.
-Usage: multirecord -o /path/to/file.wav 5.0`, 2)
+											Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 	}
-
-	RecordSeconds, err := strconv.ParseFloat(ctx.Args().Get(0), 64)
+	RecordSeconds, err = strconv.ParseFloat(ctx.Args().Get(0), 64)
 	if err != nil {
 		err = errors.Wrap(err, "error occurred while converting arg of recording time from string to float64")
 		return cli.NewExitError(err, 5)
 	}
-	fmt.Printf("Record Seconds: %.1f [sec]\n", RecordSeconds)
-
-	NumChannels := ctx.Int("c")
-	fmt.Printf("Record on %d ch\n", NumChannels)
-
-	SampleRate := ctx.Int("r")
-	fmt.Printf("Record on %d sample per sec\n", SampleRate)
-
+	NumChannels = ctx.Int("c")
+	SampleRate = ctx.Int("r")
 	BitsPerSample := ctx.Int("b")
 	if BitsPerSample != 16 {
 		return cli.NewExitError(`sorry, this app is only for 16 bits per sample for now`, 99)
 	}
-	fmt.Printf("Record on %d sample per sec\n", BitsPerSample)
+	NumSamplesToWrite = int(RecordSeconds * float64(SampleRate))
+
+	fmt.Printf("\nOutput File: \t`%s`\n", name+".wav")
+	fmt.Printf("Channels: \t%d \n", NumChannels)
+	fmt.Printf("Sample Rate: \t%d\n", SampleRate)
+	fmt.Printf("Precision: \t%d-bits\n", BitsPerSample)
+	fmt.Printf("Duration: \t%f [sec] = %d samples\n", RecordSeconds, NumSamplesToWrite)
+	fmt.Printf("Encoding: \t%d-bits Signed Integer PCM\n\n", BitsPerSample)
 
 	f1, err := os.Create(name + ".wav")
 	if err != nil {
@@ -107,17 +121,6 @@ Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 		return cli.NewExitError(err, 5)
 	}
 
-	//paParam := portaudio.StreamParameters{
-	//	Input:  portaudio.StreamDeviceParameters{inputDevice, NumChannels, inputDevice.DefaultLowInputLatency},
-	//	Output: portaudio.StreamDeviceParameters{outputDevice, NumChannels, outputDevice.DefaultLowOutputLatency},
-	//	Output:          portaudio.StreamDeviceParameters{nil, 0, outputDevice.DefaultLowOutputLatency},
-	//SampleRate:      float64(SampleRate),
-	//FramesPerBuffer: FramesPerBuffer * NumChannels,
-	//Flags:           portaudio.NoFlag,
-	//}
-
-	//////////////////////////////////
-
 	h, err := portaudio.DefaultHostApi()
 	if err != nil {
 		err = errors.Wrap(err, "internal error: error occurred while searching host API")
@@ -126,31 +129,28 @@ Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 	paParam := portaudio.LowLatencyParameters(h.DefaultInputDevice, h.DefaultOutputDevice)
 	paParam.Input.Channels = NumChannels
 	paParam.Output.Channels = 1
-	//paParam.FramesPerBuffer = FramesPerBuffer * NumChannels
 	paParam.FramesPerBuffer = FramesPerBuffer
 
-	//fmt.Println("paParam.Input.Channels", paParam.Input.Channels)
-	//fmt.Println("paParam.Output.Channels", paParam.Output.Channels)
-	//fmt.Println("paParam.SampleRate", paParam.SampleRate)
-	//fmt.Println("paParam.FramesPerBuffer", paParam.FramesPerBuffer)
-	//
-	//fmt.Printf("\n\nInput params\n\n")
-	//
-	//fmt.Println("paParam.Input.Device.Name", paParam.Input.Device.Name)
-	//fmt.Println("paParam.Input.Device.MaxInputChannels", paParam.Input.Device.MaxInputChannels)
-	//fmt.Println("paParam.Input.Device.DefaultSampleRate", paParam.Input.Device.DefaultSampleRate)
-	//fmt.Println("paParam.Input.Device.HostApi", paParam.Input.Device.HostApi)
-	//fmt.Println("paParam.Input.Device.DefaultLowInputLatency", paParam.Input.Device.DefaultLowInputLatency)
-	//fmt.Println("paParam.Input.Device.DefaultHighInputLatency", paParam.Input.Device.DefaultHighInputLatency)
-	//
-	//fmt.Printf("\n\nOutput params\n\n")
-	//
-	//fmt.Println("paParam.Output.Device.Name", paParam.Output.Device.Name)
-	//fmt.Println("paParam.Output.Device.MaxOutputChannels", paParam.Output.Device.MaxOutputChannels)
-	//fmt.Println("paParam.Output.Device.DefaultSampleRate", paParam.Output.Device.DefaultSampleRate)
-	//fmt.Println("paParam.Output.Device.HostApi", paParam.Output.Device.HostApi)
-	//fmt.Println("paParam.Output.Device.DefaultLowOutputLatency", paParam.Output.Device.DefaultLowOutputLatency)
-	//fmt.Println("paParam.Output.Device.DefaultHighOutputLatency", paParam.Output.Device.DefaultHighOutputLatency)
+	if ctx.Bool("p") {
+		fmt.Printf("\nFrames Per Buffer\n", paParam.FramesPerBuffer)
+
+		fmt.Printf("\nInput Device Parameters\n")
+		fmt.Printf("Input Device Name\t\t\t%v\n", paParam.Input.Device.Name)
+		fmt.Printf("Input Device MaxInputChannels\t\t%v\n", paParam.Input.Device.MaxInputChannels)
+		fmt.Printf("Input Device DefaultSampleRate\t\t%v\n", paParam.Input.Device.DefaultSampleRate)
+		fmt.Printf("Input Device HostApi\t\t\t%v\n", paParam.Input.Device.HostApi)
+		fmt.Printf("Input Device DefaultLowInputLatency\t%v\n", paParam.Input.Device.DefaultLowInputLatency)
+		fmt.Printf("Input Device DefaultHighInputLatency\t%v\n", paParam.Input.Device.DefaultHighInputLatency)
+
+		fmt.Printf("\n\nOutput params\n")
+		fmt.Printf("Output Device Name\t\t\t%v\n", paParam.Output.Device.Name)
+		fmt.Printf("Output Device MaxOutputChannels\t\t%v\n", paParam.Output.Device.MaxOutputChannels)
+		fmt.Printf("Output Device DefaultSampleRate\t\t%v\n", paParam.Output.Device.DefaultSampleRate)
+		fmt.Printf("Output Device HostApi\t\t\t%v\n", paParam.Output.Device.HostApi)
+		fmt.Printf("Output Device DefaultLowOutputLatency\t%v\n", paParam.Output.Device.DefaultLowOutputLatency)
+		fmt.Printf("Output Device DefaultHighOutputLatency\t%v\n", paParam.Output.Device.DefaultHighOutputLatency)
+
+	}
 
 	//open strea
 	stream, err := portaudio.OpenStream(paParam, callback)
@@ -180,7 +180,7 @@ Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 		return cli.NewExitError(err, 5)
 	}
 
-	fmt.Println("recording start...")
+	fmt.Printf("\nrecording...\n")
 
 	st := time.Now()
 	for time.Since(st).Seconds() < RecordSeconds {
@@ -192,17 +192,18 @@ Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 		return cli.NewExitError(err, 5)
 	}
 
-	fmt.Printf("\nrecording end\n")
-
-	fmt.Printf("\nSuccessfully recorded!!\n")
-	fmt.Printf("File saved as `%v`\n", name+".wav")
+	fmt.Printf("\n\nSuccessfully recorded!!\n")
 
 	return nil
 }
 
-var w1 *wav.Writer
-
-//func callback(inBuf, outBuf []int16) {
 func callback(inBuf, outBuf []int16) {
+	if NumWritten+FramesPerBuffer > NumSamplesToWrite {
+		numWrite := NumSamplesToWrite - NumWritten
+		NumWritten += numWrite
+		w1.WriteSamples(inBuf[:numWrite])
+		return
+	}
+	NumWritten += len(inBuf) / NumChannels
 	w1.WriteSamples(inBuf)
 }
