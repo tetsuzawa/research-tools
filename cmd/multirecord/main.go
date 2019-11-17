@@ -181,11 +181,9 @@ Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 	}
 
 	fmt.Println("recording start...")
+
 	st := time.Now()
-	stopTime := st.Add(time.Duration(RecordSeconds) * 1000 * time.Millisecond)
-	fmt.Println(stopTime)
-	for !st.After(stopTime) {
-		fmt.Println(stopTime)
+	for time.Since(st).Seconds() < RecordSeconds {
 		fmt.Printf("%.1f[sec] : %.1f[sec]\r", time.Since(st).Seconds(), RecordSeconds)
 	}
 	err = stream.Stop()

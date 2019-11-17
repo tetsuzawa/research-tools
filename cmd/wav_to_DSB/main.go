@@ -11,9 +11,9 @@ DateCreated  : 2019/11/16
 package main
 
 import (
-	"github.com/pkg/errors"
 	"os"
 
+	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
 
