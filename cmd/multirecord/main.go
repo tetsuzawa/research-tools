@@ -24,7 +24,7 @@ func main() {
 
 	app.Name = "multirecord"
 	app.Usage = `This app records sounds with multi channels and save as .wav file or .DSB files if --DSB is specified.`
-	app.Version = "0.1.1"
+	app.Version = "0.1.2"
 
 	app.Action = multiRecord
 

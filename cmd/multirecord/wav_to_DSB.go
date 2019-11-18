@@ -64,7 +64,7 @@ audio format: want 1 (PCM), got %v`, fs, w.BitDepth, w.WavAudioFormat)
 		return cli.NewExitError(err, 3)
 	}
 
-	iter := aBuf.NumFrames() / ch
+	iter := aBuf.NumFrames()
 	wBuf := make([]byte, iter*bps)
 
 	// ************* split channel and write to .DSB files *************
