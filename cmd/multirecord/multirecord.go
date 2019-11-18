@@ -3,7 +3,7 @@ Contents: multi channel record.
 	This program works as typical recording app with multi channels.
 	Output file format is .wav.
 	Please run `multirecord --help` for details.
-Usage: multirecord (-c num_ch -r sample_rate -b bits_per_sample -o /path/to/out.wav) 5
+Usage: multirecord (-c ch -r rate -b bits -o /path/to/out.wav) sec
 Author: Tetsu Takizawa
 E-mail: tt15219@tomakomai.kosen-ac.jp
 LastUpdate: 2019/11/18
@@ -44,19 +44,19 @@ var (
 func multiRecord(ctx *cli.Context) error {
 	// ************* check argument *************
 	if ctx.Args().Get(0) == "" {
-		return cli.NewExitError(`too few arguments. need recording duration.
-								Usage: multirecord (-c ch -r rate -b bits -o /path/to/out.wav) duration
-								`, 2)
+		return cli.NewExitError(`too few arguments. need recording duration
+Usage: multirecord (-c ch -r rate -b bits -o /path/to/out.wav) duration
+`, 2)
 	}
 
-	// ************* ext validation *************
+	// ************* validate ext *************
 	name, ext := splitPathAndExt(ctx.String("o"))
-	if ext != ".wav" {
+	if ext != ".wav" && ext != "" {
 		return cli.NewExitError(`incorrect file format. multirecord saves audio as .wav file.
-											Usage: multirecord -o /path/to/file.wav 5.0`, 2)
+Usage: multirecord -o /path/to/file.wav 5.0`, 2)
 	}
 
-	// ************* parameter validation *************
+	// ************* validate parameter *************
 	RecordSeconds, err = strconv.ParseFloat(ctx.Args().Get(0), 64)
 	if err != nil {
 		err = errors.Wrap(err, "error occurred while converting arg of recording time from string to float64")
@@ -70,7 +70,7 @@ func multiRecord(ctx *cli.Context) error {
 	}
 	NumSamplesToWrite = int(RecordSeconds * float64(SampleRate))
 
-	// ************* output file creation *************
+	// ************* create output file *************
 	f1, err := os.Create(name + ".wav")
 	if err != nil {
 		err = errors.Wrap(err, "internal error: error occurred while creating output file")
@@ -85,7 +85,7 @@ func multiRecord(ctx *cli.Context) error {
 	}
 	aBuf.SourceBitDepth = BitsPerSample
 
-	// ************* portaudio initialization *************
+	// ************* initialize portaudio*************
 	err = portaudio.Initialize()
 	defer portaudio.Terminate()
 	if err != nil {
@@ -111,7 +111,7 @@ func multiRecord(ctx *cli.Context) error {
 	}
 	defer stream.Close()
 
-	// ************* parameter expression *************
+	// ************* print parameter *************
 	fmt.Printf("\nOutput File: \t`%s`\n", name+".wav")
 	fmt.Printf("Channels: \t%d \n", NumChannels)
 	fmt.Printf("Sample Rate: \t%d\n", SampleRate)
@@ -139,7 +139,7 @@ func multiRecord(ctx *cli.Context) error {
 		fmt.Printf("Output Device DefaultHighOutputLatency\t%v\n", paParam.Output.Device.DefaultHighOutputLatency)
 	}
 
-	// ************* recording *************
+	// ************* record audio *************
 	err = stream.Start()
 	if err != nil {
 		err = errors.Wrap(err, "internal error: error occurred while starting stream")
@@ -161,6 +161,13 @@ func multiRecord(ctx *cli.Context) error {
 	check(err)
 
 	fmt.Printf("\n\nSuccessfully recorded!!\n")
+
+	if ctx.Bool("D") {
+		err = wavToDSB(ctx, name)
+		if err != nil {
+			err = errors.Wrap(err, "error occurred while converting .wav file to .DSB files")
+		}
+	}
 
 	return nil
 }
