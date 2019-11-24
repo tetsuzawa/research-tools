@@ -1,4 +1,5 @@
-# %%
+#encording: utf-8
+
 import os
 import argparse
 import pathlib
@@ -19,22 +20,19 @@ Example:
 
 """
 
-plt.rcParams['font.family'] = 'IPAPGothic'  # 使用するフォント
-# x軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
+plt.rcParams['font.family'] = 'IPAPGothic'
 plt.rcParams['xtick.direction'] = 'in'
-# y軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')
 plt.rcParams['ytick.direction'] = 'in'
-plt.rcParams['xtick.top'] = True  # x軸の目盛線の上側を表示
-plt.rcParams['ytick.right'] = True  # y軸の目盛線の右側を表示
-plt.rcParams['xtick.major.width'] = 1.0  # x軸主目盛り線の線幅
-plt.rcParams['ytick.major.width'] = 1.0  # y軸主目盛り線の線幅
-plt.rcParams['font.size'] = 11  # フォントの大きさ
-plt.rcParams['axes.linewidth'] = 1.0  # 軸の線幅edge linewidth。囲みの太さ
+plt.rcParams['xtick.top'] = True 
+plt.rcParams['ytick.right'] = True 
+plt.rcParams['xtick.major.width'] = 1.0 
+plt.rcParams['ytick.major.width'] = 1.0 
+plt.rcParams['font.size'] = 11 
+plt.rcParams['axes.linewidth'] = 1.0 
 plt.rcParams['figure.figsize'] = (8, 7)
-plt.rcParams['figure.dpi'] = 300  # dpiの設定
-plt.rcParams['figure.subplot.hspace'] = 0.3  # 図と図の幅
-plt.rcParams['figure.subplot.wspace'] = 0.3  # 図と図の幅
-
+plt.rcParams['figure.dpi'] = 300 
+plt.rcParams['figure.subplot.hspace'] = 0.3 
+plt.rcParams['figure.subplot.wspace'] = 0.3 
 
 def main():
     parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
@@ -53,6 +51,7 @@ def main():
                         nargs='?',
                         const="/Users/tetsu/personal_files/Research/filters/test/img",
                         default=".",
+                        # default=None,
                         type=str,
                         help='Directory path where you want to locate png files. (default: current directory)',
                         metavar=None)
@@ -75,10 +74,9 @@ def main():
     plt.legend()
     plt.title('LMS Algorithm Online')
 
-    # img_out_dir = "/Users/tetsu/personal_files/Research/filters/test/LMS_img/"
     img_out_dir = pathlib.Path(args.dst_path)
     img_out_name = "".join(input_name_list[:-1]) + ".png"
-    img_out_path = img_out_dir.joinpath(img_out_name)
+    img_out_path = pathlib.Path.joinpath(img_out_dir, img_out_name)
     plt.savefig(img_out_path)
     print("\nfilterd data plot is saved at: ", img_out_path, "\n")
 
