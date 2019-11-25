@@ -7,8 +7,8 @@ import wave
 from scipy import fromstring, int16, frombuffer
 
 # self made module
-import wave_process
-import plot_tool
+import modules.wave_process
+import modules.plot_tool
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
         strs = open_file(audiofile)
         data = np.fromstring(strs, dtype=np.int16)
     elif ext == ".wav":
-        audiodata = wave_process.wave_proccess(audiofile)
+        audiodata = wave_process.WaveHandler(audiofile)
         data = audiodata.data
         channels = audiodata.ch
 

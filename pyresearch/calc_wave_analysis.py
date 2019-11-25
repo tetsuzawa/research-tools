@@ -7,9 +7,9 @@ sys.path.append('./')
 sys.path.append('/Users/tetsu/personal_files/Research')
 sys.path.append('/Users/tetsu/personal_files/Research/research_tools')
 
-from wave_handler_multi_ch import WaveHandler
+from modules.wave_handler_multi_ch import WaveHandler
 # from wave_process import WaveHandler
-from plot_tools import PlotTools
+from modules.plot_tools import PlotTools
 
 # from research_tools.wave_handler import WaveHandler
 # from research_tools.plot_tools import PlotTools
