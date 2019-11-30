@@ -1,23 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# import sys
-# import os.path
-# import struct
-# import string
-# import math
-# import time
-
 import numpy as np
-# import pandas as pd
-# import wave
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
-
-# import matplotlib.ticker as ticker
-# from matplotlib.backends.backend_pdf import PdfPages
-# from collections import OrderedDict
-# from scipy import signal
-# from stft import stft
 
 plt.rcParams['font.family'] = 'IPAPGothic'  # 使用するフォント
 # x軸の目盛線が内向き('in')か外向き('out')か双方向か('inout')

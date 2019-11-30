@@ -72,7 +72,7 @@ def main():
     plt.plot(e, "y-", alpha=0.5, label="error e(n)")
     plt.grid()
     plt.legend()
-    plt.title('LMS Algorithm Online')
+    plt.title('ADF Output')
 
     img_out_dir = pathlib.Path(args.dst_path)
     img_out_name = "".join(input_name_list[:-1]) + ".png"
