@@ -1,4 +1,4 @@
-#encording: utf-8
+# encording: utf-8
 
 import os
 import argparse
@@ -24,16 +24,17 @@ Example:
 plt.rcParams['font.family'] = 'IPAPGothic'
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
-plt.rcParams['xtick.top'] = True 
-plt.rcParams['ytick.right'] = True 
-plt.rcParams['xtick.major.width'] = 1.0 
-plt.rcParams['ytick.major.width'] = 1.0 
-plt.rcParams['font.size'] = 11 
-plt.rcParams['axes.linewidth'] = 1.0 
+plt.rcParams['xtick.top'] = True
+plt.rcParams['ytick.right'] = True
+plt.rcParams['xtick.major.width'] = 1.0
+plt.rcParams['ytick.major.width'] = 1.0
+plt.rcParams['font.size'] = 11
+plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
-plt.rcParams['figure.dpi'] = 300 
-plt.rcParams['figure.subplot.hspace'] = 0.3 
-plt.rcParams['figure.subplot.wspace'] = 0.3 
+plt.rcParams['figure.dpi'] = 300
+plt.rcParams['figure.subplot.hspace'] = 0.3
+plt.rcParams['figure.subplot.wspace'] = 0.3
+
 
 def main():
     parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
@@ -57,43 +58,67 @@ def main():
                         help='Directory path where you want to locate png files. (default: current directory)',
                         metavar=None)
 
-    parser.add_argument('-l', '--log',
-                        action='store_true',
-                        help='Use y-axis logarithmic display.')
+    # parser.add_argument('-t', '--taps',
+    #                     action='store',
+    #                     nargs='?',
+    #                     default=4,
+    #                     default=None,
+                        # type=int,
+                        # help='Directory path where you want to locate png files. (default: current directory)',
+                        # metavar=None)
 
     args = parser.parse_args()
 
     input_name = args.csv_path
     input_name = pathlib.Path(input_name)
 
-    is_logarithm = args.log
-
     df = pd.read_csv(input_name, header=None)
     print("analize file name: ", input_name)
 
-    d, y, e = df[0], df[1], df[2]
+    d, y, e, mse = df[0], df[1], df[2], df[3]
 
-    fig, (ax1, ax2) = plt.subplots(2, 1)
-    if is_logarithm:
-        ax1.set_yscale("log")
-        ax2.set_yscale("log")
-        d /= np.max(d)
-        y /= np.max(d)
-        e /= np.max(e)
+    fig = plt.figure()
+    # mse_tap = args.taps
+    # mse = []
+    # for i in range(len(d) - mse_tap):
+    #     mse.append(MSE(d[i:i + mse_tap], y[i:i + mse_tap]))
+    # mse = [MSE(e[i:i + mse_tap]) for i in range(len(e) - mse_tap)]
+    #
+    # log_mse = 20 * np.log10(mse)
+    # print(log_mse[:5])
+    # if np.max(log_mse) > 1:
+    #     log_mse -= np.max(log_mse)
+    # else:
+    #     log_mse += np.max(log_mse)
+    # print(log_mse[:5])
 
-    ax1.plot(d, "b--", alpha=0.5, label="desired signal d(n)")
-    ax1.plot(y, "r-", alpha=0.5, label="output y(n)")
-    ax1.legend()
-    ax2.plot(e, "y-", alpha=1.0, label="error e(n)")
+    ax1 = fig.add_subplot(111)
+    ax1.set_ylabel("MSE [dB]")
+    ax1.set_xlabel("iteration")
+    ax1.plot(mse, "y-", alpha=1.0)
+    # ax1.set_yscale("log")
     plt.grid()
-    ax2.legend()
-    plt.title('ADF Output')
 
     output_dir = pathlib.Path(args.dst_path)
+    input_name = pathlib.Path(str(input_name.stem) + "_conv")
     output_name = pathlib.Path(input_name.name).with_suffix(".png")
     output_path = pathlib.Path.joinpath(output_dir, output_name)
     plt.savefig(output_path)
     print("\nfilterd data plot is saved at: ", output_path, "\n")
+
+
+def MSE(y_list, x_list=None):
+    if x_list is None:
+        x_list = np.zeros(len(y_list))
+    x_list = np.array(x_list)
+    y_list = np.array(y_list)
+    # mse = []
+    # for i in range(len(x_list)):
+    #     mse.append((x_list[i] - y_list[i]) ** 2)
+
+    mse = (y_list - x_list) ** 2
+
+    return sum(mse) / len(mse)
 
 
 # %%

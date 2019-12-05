@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     snr_start = args.snr_start
     snr_end = args.snr_end
-    snr_div_num = args.snr_div_num
+    snr_div_num = int(args.snr_div_num)
     snr_list = np.linspace(snr_start, snr_end, snr_div_num)
 
     for snr in snr_list:

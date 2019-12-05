@@ -29,7 +29,7 @@ def create_data(freq_list=[800], start_pos=0):  # オシレーター
     for n in np.arange(start_pos, end_pos):
         s = 0.0  # 波形データをゼロクリア
         for f in freq_list:
-            s += amp * np.sin(2 * np.pi * f * n / 44100)
+            s += amp * np.sin(2 * np.pi * float(f) * n / 44100)
         # 振幅が大きい時はクリッピング
         if s > 1.0:  s = 1.0
         if s < -1.0: s = -1.0
@@ -47,7 +47,9 @@ if __name__ == '__main__':
     # ストリームを開く
     p = pyaudio.PyAudio()
     stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, output=1)
-    freq_list = []
+    freq_list = sys.argv[1:]
+    freq_list = list(map(float, freq_list))
+
     for i, freq in enumerate(sys.argv):
         if i == 0:
             continue
