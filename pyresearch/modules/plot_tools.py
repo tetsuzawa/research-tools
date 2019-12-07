@@ -13,7 +13,7 @@ plt.rcParams['xtick.top'] = True  # x軸の目盛線の上側を表示
 plt.rcParams['ytick.right'] = True  # y軸の目盛線の右側を表示
 plt.rcParams['xtick.major.width'] = 1.0  # x軸主目盛り線の線幅
 plt.rcParams['ytick.major.width'] = 1.0  # y軸主目盛り線の線幅
-plt.rcParams['font.size'] = 11  # フォントの大きさ
+plt.rcParams['font.size'] = 16  # フォントの大きさ
 plt.rcParams['axes.linewidth'] = 1.0  # 軸の線幅edge linewidth。囲みの太さ
 plt.rcParams['figure.figsize'] = (8, 7)
 plt.rcParams['figure.dpi'] = 100  # dpiの設定
@@ -255,10 +255,11 @@ class PlotTools(object):
                         cmap="inferno",
                         interpolation="nearest",
                         norm=Normalize(vmin=-80, vmax=0))
-        ax1.set_xlabel("time[sec]")
-        ax1.set_ylabel("frequency[Hz]")
-        ax1.set_title("STFT")
+        ax1.set_xlabel("Time[sec]")
+        ax1.set_ylabel("Frequency[Hz]")
+        ax1.set_title("Spectrogram")
         pp1 = fig.colorbar(im, ax=ax1, orientation="vertical")
+        plt.tight_layout()
         # pp1.set_clim(-80, 0)
         pp1.set_label("power")
         plt.show()
@@ -281,6 +282,7 @@ class PlotTools(object):
         # norm=Normalize(vmin=-4, vmax=4))
         pp2 = fig.colorbar(im2, ax=ax2, orientation="vertical")
         # pp.set_clim(-80, 0)
+        plt.tight_layout()
         pp2.set_label("power")
 
         plt.show()

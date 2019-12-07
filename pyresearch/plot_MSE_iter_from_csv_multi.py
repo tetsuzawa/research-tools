@@ -18,7 +18,7 @@ plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 plt.rcParams['xtick.major.width'] = 1.0
 plt.rcParams['ytick.major.width'] = 1.0
-plt.rcParams['font.size'] = 11
+plt.rcParams['font.size'] = 16
 plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
 plt.rcParams['figure.dpi'] = 300
@@ -78,10 +78,12 @@ def main():
     ax1.plot(mse1, "y-", alpha=0.5, label="NLMS")
     ax1.plot(mse2, "r-", alpha=0.5, label="AP")
     ax1.plot(mse3, "b-", alpha=0.5, label="RLS")
+    ax1.set_ylim(-80, 5)
     ax1.set_ylabel("MSE [dB]")
     ax1.set_xlabel("iteration")
     ax1.legend()
     plt.grid()
+    plt.tight_layout()
 
     output_dir = pathlib.Path(args.dst_path)
     subject = str(input_name_1.stem).split("_")[1]

@@ -8,7 +8,7 @@ from scipy import fromstring, int16, frombuffer
 
 # self made module
 import modules.wave_process
-import modules.plot_tool
+from modules.plot_tools import plot_tool
 
 
 def main():

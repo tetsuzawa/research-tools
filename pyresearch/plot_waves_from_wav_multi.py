@@ -30,6 +30,15 @@ plt.rcParams['figure.subplot.wspace'] = 0.3
 def main():
     parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
 
+    parser.add_argument('input_paths',
+                        action='store',
+                        nargs="*",
+                        const=None,
+                        default=None,
+                        type=str,
+                        help='paths where the wav file is located.',
+                        metavar=None)
+
     parser.add_argument('-d', '--dst_path',
                         action='store',
                         nargs='?',
@@ -42,22 +51,26 @@ def main():
 
     args = parser.parse_args()
     output_dir = pathlib.Path(args.dst_path)
+    input_paths = args.input_paths
 
-    for input_path in sys.args[1:]:
-
+    for i, input_path in enumerate(input_paths):
         data, sr = sf.read(input_path)
 
         print("analize file name: ", input_path)
 
-        fig, ax = plt.subplots(1,1,figsize=(12, 6))
+        fig, ax = plt.subplots(1, 1, figsize=(12, 4))
+
+        if i == 2:
+            data *= 0.3
 
         ax.plot(data, "b")
+        ax.set_ylim(-1,1)
         ax.set_xlabel("iteration")
-        ax.legend()
+        plt.tight_layout()
         plt.grid()
 
         output_name = pathlib.Path(input_path).with_suffix(".png")
-        output_path = pathlib.Path.joinpath(output_dir, output_name)
+        output_path = pathlib.Path.joinpath(output_dir, output_name.name)
         plt.savefig(output_path)
         print("\n plot is saved at: ", output_path, "\n")
 
