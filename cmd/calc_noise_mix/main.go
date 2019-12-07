@@ -32,6 +32,12 @@ func main() {
 
 	flag.Parse()
 
+	if cleanFilepath == "/path/to/clean_file.wav" ||
+		noiseFilepath == "/path/to/noise_file.wav" ||
+		outputDir == "/path/to/dir/" {
+		flag.Usage()
+		os.Exit(1)
+	}
 	fmt.Println("clean file path:", cleanFilepath)
 	fmt.Println("noise file path:", noiseFilepath)
 	fmt.Println("ouput directory:", outputDir)
@@ -51,8 +57,8 @@ func main() {
 	w2.ReadInfo()
 	ch1 := int(w1.NumChans)
 	ch2 := int(w2.NumChans)
-	bitDepth1 := int(w1.BitDepth/8) * ch1
-	bitDepth2 := int(w2.BitDepth/8) * ch2
+	bitDepth1 := int(w1.BitDepth)
+	bitDepth2 := int(w2.BitDepth)
 	bps1 := bitDepth1 / ch1
 	bps2 := bitDepth2 / ch2
 	fs1 := int(w1.SampleRate)
@@ -81,8 +87,16 @@ func main() {
 
 	cleanRMS := CalcRMS(cleanAMP)
 
-	start := rand.Intn(len(cleanAMP) - len(noiseAMP))
-	cutNoiseAmp := noiseAMP[start : start+len(cleanAMP)]
+	var start int
+	var cutNoiseAmp []float64
+	if len(cleanAMP) > len(noiseAMP) {
+		start = rand.Intn(len(cleanAMP) - len(noiseAMP))
+		cleanAMP = cleanAMP[start : start+len(cleanAMP)]
+		cutNoiseAmp = noiseAMP
+	} else {
+		start = rand.Intn(len(noiseAMP) - len(cleanAMP))
+		cutNoiseAmp = noiseAMP[start : start+len(cleanAMP)]
+	}
 	noiseRMS := CalcRMS(cutNoiseAmp)
 	snrList := LinSpace(snrStart, snrEnd, snrDiv)
 
@@ -95,6 +109,11 @@ func main() {
 		outputName       string
 		outputPath       string
 	)
+	wBuf.Format = &audio.Format{
+		NumChannels: ch1,
+		SampleRate:  fs1,
+	}
+	wBuf.SourceBitDepth = bitDepth1
 	for _, snr := range snrList {
 		adjustedNoiseRMS := CalcAdjustedRMS(cleanRMS, snr)
 
