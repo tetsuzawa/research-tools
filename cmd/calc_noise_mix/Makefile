@@ -1,7 +1,7 @@
 .PHONY: build
 build:
 #	go build -o build/$(BIN_NAME)  -ldflags '-s -w' .
-	go build -o build/$(BIN_NAME) .
+	go build -o bin/$(BIN_NAME) .
 
 
 .PHONY: install

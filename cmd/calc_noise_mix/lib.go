@@ -35,6 +35,29 @@ func Float64sToInts(fs []float64) []int {
 	return is
 }
 
+func AbsFloat64s(fs []float64) []float64 {
+	fsAbs := make([]float64, len(fs))
+	for i, v := range fs {
+		fsAbs[i] = math.Abs(v)
+	}
+	return fsAbs
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -1 * x
+	}
+	return x
+}
+
+func AbsInts(is []int) []int {
+	isAbs := make([]int, len(is))
+	for i, v := range is {
+		isAbs[i] = abs(v)
+	}
+	return isAbs
+}
+
 func LinSpace(start, end float64, n int) []float64 {
 	res := make([]float64, n)
 	if n == 1 {

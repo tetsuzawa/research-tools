@@ -6,6 +6,7 @@ import (
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
 	"gonum.org/v1/gonum/floats"
+	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -14,6 +15,9 @@ import (
 )
 
 func main() {
+
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	var (
 		cleanFilepath string
 		noiseFilepath string
@@ -59,8 +63,8 @@ func main() {
 	ch2 := int(w2.NumChans)
 	bitDepth1 := int(w1.BitDepth)
 	bitDepth2 := int(w2.BitDepth)
-	bps1 := bitDepth1 / ch1
-	bps2 := bitDepth2 / ch2
+	bps1 := bitDepth1 / 8
+	bps2 := bitDepth2 / 8
 	fs1 := int(w1.SampleRate)
 	fs2 := int(w2.SampleRate)
 
@@ -115,35 +119,47 @@ func main() {
 	}
 	wBuf.SourceBitDepth = bitDepth1
 	for _, snr := range snrList {
+
 		adjustedNoiseRMS := CalcAdjustedRMS(cleanRMS, snr)
 
 		for i, v := range cutNoiseAmp {
 			adjustedNoiseAmp[i] = v * (adjustedNoiseRMS / noiseRMS)
 			mixedAmp[i] = cleanAMP[i] + adjustedNoiseAmp[i]
 		}
-
-		if floats.Max(mixedAmp) > math.MaxInt16 {
-			reductionRate := math.MaxInt16 / floats.Max(mixedAmp)
+		maxAmp := floats.Max(AbsFloat64s(mixedAmp))
+		if maxAmp > math.MaxInt16+1 {
+			reductionRate := math.MaxInt16 / maxAmp
 			for i, _ := range cutNoiseAmp {
 				mixedAmp[i] *= reductionRate
 			}
 		}
+
+		wBuf.Data = Float64sToInts(mixedAmp)
+		//dataCopy := make([]int, len(wBuf.Data))
+		//copy(dataCopy, wBuf.Data)
+		//sort.Ints(AbsInts(dataCopy))
+		//log.Println("Clip judge!!")
+		//if dataCopy[0] < math.MinInt16 || dataCopy[len(dataCopy)-1] > math.MaxInt16 {
+		//	log.Fatalln("Clip!!")
+		//}
 
 		outputName, _ = splitPathAndExt(cleanFilepath)
 		outputPath = filepath.Join(outputDir, filepath.Base(outputName)+"_snr"+strconv.Itoa(int(snr))+".wav")
 		fw, err = os.Create(outputPath)
 		check(err)
 		ww = wav.NewEncoder(fw, fs1, bitDepth1, ch1, 1)
-		wBuf.Data = Float64sToInts(mixedAmp)
 		err = ww.Write(wBuf)
 		check(err)
 		err = ww.Close()
 		check(err)
+
 	}
+	fmt.Printf("\nSuccessfully created following SN Rate files!! SNR: %v\n", snrList)
 }
 
 func check(err error) {
 	if err != nil {
 		panic(err)
+		//log.Fatalln(err)
 	}
 }
