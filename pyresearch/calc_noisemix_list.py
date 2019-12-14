@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
         # Avoid clipping noise
         max_int16 = np.iinfo(np.int16).max
-        if mixed_amp.max(axis=0) > ma x_int16:
+        if mixed_amp.max(axis=0) > max_int16:
             reduction_rate = max_int16 / mixed_amp.max(axis=0)
             mixed_amp = mixed_amp * reduction_rate
 
