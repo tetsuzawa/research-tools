@@ -60,9 +60,20 @@ def main():
                         help='Directory path where you want to locate png files. (default: current directory)',
                         metavar=None)
 
+    parser.add_argument('-s', '--sample',
+                        action='store',
+                        nargs='?',
+                        const=-1,
+                        default=-1,
+                        # default=None,
+                        type=int,
+                        help='Number of samples to plot',
+                        metavar=None)
+
     args = parser.parse_args()
     output_dir = pathlib.Path(args.dst_path)
     input_paths = args.input_paths
+    sample = args.sample
 
     # input_name_1 = args.input_path_1
     # input_name_2 = args.input_path_2
@@ -90,11 +101,11 @@ def main():
         print("analize file name: ", input_path)
 
         input_path = pathlib.Path(input_path)
-        num = str(input_path.stem).split("-")[1].split(".")[0]
+        num = str(input_path.stem).split("-")[1].split(".")[0].split("_")[0]
 
         d, y, e, mse = df[0], df[1], df[2], df[3]
 
-        ax.plot(mse, colors[i], alpha=0.5, label=num)
+        ax.plot(mse[:sample], colors[i], alpha=0.5, label=num)
 
     ax.legend()
     ax.set_ylabel("MSE [dB]")

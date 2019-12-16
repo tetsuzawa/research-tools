@@ -29,26 +29,18 @@ plt.rcParams['figure.subplot.wspace'] = 0.3
 def main():
     parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
 
-    # parser.add_argument('input_path_1',
-    #                     action='store',
-    #                     type=str,
-    #                     help='Directory path where the csv file is located.',)
-    # parser.add_argument('input_path_2',
-    #                     action='store',
-    #                     type=str,
-    #                     help='Directory path where the csv file is located.',)
-    # parser.add_argument('input_path_3',
-    #                     action='store',
-    #                     type=str,
-    #                     help='Directory path where the csv file is located.',)
-    parser.add_argument('input_paths',
+    parser.add_argument('input_path_1',
                         action='store',
-                        nargs="*",
-                        const=None,
-                        default=None,
                         type=str,
-                        help='paths where the csv file is located.',
-                        metavar=None)
+                        help='Directory path where the csv file is located.',)
+    parser.add_argument('input_path_2',
+                        action='store',
+                        type=str,
+                        help='Directory path where the csv file is located.',)
+    parser.add_argument('input_path_3',
+                        action='store',
+                        type=str,
+                        help='Directory path where the csv file is located.',)
 
     parser.add_argument('-d', '--dst_path',
                         action='store',
@@ -62,63 +54,41 @@ def main():
 
     args = parser.parse_args()
     output_dir = pathlib.Path(args.dst_path)
-    input_paths = args.input_paths
 
-    # input_name_1 = args.input_path_1
-    # input_name_2 = args.input_path_2
-    # input_name_3 = args.input_path_3
-    # input_name_1 = pathlib.Path(input_name_1)
-    # input_name_2 = pathlib.Path(input_name_2)
-    # input_name_3 = pathlib.Path(input_name_3)
-    #
-    # df1 = pd.read_csv(input_name_1, header=None)
-    # df2 = pd.read_csv(input_name_2, header=None)
-    # df3 = pd.read_csv(input_name_3, header=None)
-    # print("analize file name: ", input_name_1)
-    # print("analize file name: ", input_name_2)
-    # print("analize file name: ", input_name_3)
+    input_name_1 = args.input_path_1
+    input_name_2 = args.input_path_2
+    input_name_3 = args.input_path_3
+    input_name_1 = pathlib.Path(input_name_1)
+    input_name_2 = pathlib.Path(input_name_2)
+    input_name_3 = pathlib.Path(input_name_3)
 
-    colors = ["y-", "r-", "b-", "g-", "c-", "m-"]
+    df1 = pd.read_csv(input_name_1, header=None)
+    df2 = pd.read_csv(input_name_2, header=None)
+    df3 = pd.read_csv(input_name_3, header=None)
+    print("analize file name: ", input_name_1)
+    print("analize file name: ", input_name_2)
+    print("analize file name: ", input_name_3)
 
-    fig, ax = plt.subplots(1, 1, figsize=(8, 7))
-    for i, input_path in enumerate(input_paths):
-        df = pd.read_csv(input_path, header=None)
-        print("analize file name: ", input_path)
+    d1, y1, e1, mse1 = df1[0], df1[1], df1[2], df1[3]
+    d2, y2, e2, mse2 = df2[0], df2[1], df2[2], df2[3]
+    d3, y3, e3, mse3 = df3[0], df3[1], df3[2], df3[3]
 
-        input_path = pathlib.Path(input_path)
-        num = str(input_path.stem).split("-")[1].split(".")[0]
+    fig = plt.figure()
 
-        d, y, e, mse = df[0], df[1], df[2], df[3]
-
-        ax.plot(mse, colors[i], alpha=0.5, label=num)
-
-    ax.legend()
-    ax.set_ylabel("MSE [dB]")
-    ax.set_xlabel("iteration")
-    ax.set_ylim(-80, 5)
-
-    plt.tight_layout()
+    ax1 = fig.add_subplot(111)
+    ax1.plot(mse1, "y-", alpha=0.5, label="NLMS")
+    ax1.plot(mse2, "r-", alpha=0.5, label="AP")
+    ax1.plot(mse3, "b-", alpha=0.5, label="RLS")
+    ax1.set_ylim(-80, 5)
+    ax1.set_ylabel("MSE [dB]")
+    ax1.set_xlabel("iteration")
+    ax1.legend()
     plt.grid()
+    plt.tight_layout()
 
-    # d1, y1, e1, mse1 = df1[0], df1[1], df1[2], df1[3]
-    # d2, y2, e2, mse2 = df2[0], df2[1], df2[2], df2[3]
-    # d3, y3, e3, mse3 = df3[0], df3[1], df3[2], df3[3]
-    #
-    # fig = plt.figure()
-
-    # ax1 = fig.add_subplot(111)
-    # ax1.plot(mse1, "y-", alpha=0.5, label="NLMS")
-    # ax1.plot(mse2, "r-", alpha=0.5, label="AP")
-    # ax1.plot(mse3, "b-", alpha=0.5, label="RLS")
-    # ax1.set_ylim(-80, 5)
-    # ax1.set_ylabel("MSE [dB]")
-    # ax1.set_xlabel("iteration")
-    # ax1.legend()
-    # plt.grid()
-    # plt.tight_layout()
-
-    algo = str(input_path.stem).split("_")[0]
-    subject = str(input_path.stem).split("_")[1]
+    num = str(input_name_1.stem).split("-")[1].split(".")[0]
+    algo = str(input_name_1.stem).split("_")[0]
+    subject = str(input_name_1.stem).split("_")[1]
     output_name = pathlib.Path(algo + "_" + subject + "_L-" + num).with_suffix(".png")
     output_path = pathlib.Path.joinpath(output_dir, output_name)
     plt.savefig(output_path)
