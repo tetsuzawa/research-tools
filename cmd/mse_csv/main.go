@@ -33,6 +33,7 @@ func main() {
 	var v float64
 	var err error
 	for i := 0; i < len(es)-tap; i++ {
+		fmt.Printf("working... %d%%\r", (i+1)*100/(len(es)-tap))
 		v, err = MSE(es[i:i+tap], nil)
 		check(err)
 		mse[i] = 20 * math.Log10(v)
