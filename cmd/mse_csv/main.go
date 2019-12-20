@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/pkg/errors"
-	"gonum.org/v1/gonum/floats"
 	"math"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
+	"gonum.org/v1/gonum/floats"
 )
 
 func main() {
@@ -33,7 +34,9 @@ func main() {
 	var v float64
 	var err error
 	for i := 0; i < len(es)-tap; i++ {
+
 		fmt.Printf("working... %d%%\r", (i+1)*100/(len(es)-tap))
+
 		v, err = MSE(es[i:i+tap], nil)
 		check(err)
 		mse[i] = 20 * math.Log10(v)
@@ -97,6 +100,7 @@ func MSE(a []float64, b []float64) (float64, error) {
 	} else if len(a) != len(b) {
 		return 0, errors.New("length of a and b must agree")
 	}
+
 	var sum float64
 	for i := 0; i < len(a); i++ {
 		sum += (a[i] - b[i]) * (a[i] - b[i])
