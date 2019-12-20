@@ -26,6 +26,8 @@ func main() {
 	flag.IntVar(&order, "order", 8, "order")
 	flag.StringVar(&dataDir, "dir", "./", "save dir")
 
+	flag.Parse()
+
 	fmt.Println("wavName:", wavName)
 	fmt.Println("adfName:", adfName)
 	fmt.Println("mu:", Mu)
@@ -33,10 +35,8 @@ func main() {
 	fmt.Println("order:", order)
 	fmt.Println("dataDir:", dataDir)
 
-	flag.Parse()
-
 	var testName string
-	applicationName := "auto"
+	applicationName := "static"
 
 	switch adfName {
 	case "LMS":

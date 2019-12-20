@@ -71,7 +71,6 @@ func ReadDataFromCSV(inputPath string) (ds []float64, ys []float64, es []float64
 		es = append(es, e)
 	}
 	return ds, ys, es
-
 }
 
 func SaveDataAsCSV(d, y, e, mse []float64, dataDir string, testName string) {
