@@ -93,7 +93,10 @@ func main() {
 
 	var start int
 	var cutNoiseAmp []float64
-	if len(cleanAMP) > len(noiseAMP) {
+	if len(cleanAMP) == len(noiseAMP){
+		start = 0
+		cutNoiseAmp = noiseAMP[start : start+len(cleanAMP)]
+	} else if len(cleanAMP) > len(noiseAMP) {
 		start = rand.Intn(len(cleanAMP) - len(noiseAMP))
 		cleanAMP = cleanAMP[start : start+len(cleanAMP)]
 		cutNoiseAmp = noiseAMP
