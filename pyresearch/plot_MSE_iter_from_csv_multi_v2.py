@@ -134,7 +134,7 @@ def main():
 
     algo = str(input_path.stem).split("_")[0]
     subject = str(input_path.stem).split("_")[1]
-    output_name = pathlib.Path(algo + "_" + subject + "_L-" + num).with_suffix(".png")
+    output_name = pathlib.Path(algo + "_" + subject).with_suffix(".png")
     output_path = pathlib.Path.joinpath(output_dir, output_name)
     plt.savefig(output_path)
     print("\nfilterd data plot is saved at: ", output_path, "\n")
