@@ -1,4 +1,4 @@
-package tools
+package goresearch
 
 import (
 	"bufio"
@@ -244,7 +244,6 @@ func FastConvolve(xs, ys []float64) []float64 {
 
 	var rs = make([]float64, M)
 	var Rs = make([]complex128, M)
-
 
 	fmt.Printf("calcurating fft...\n")
 
