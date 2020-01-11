@@ -210,35 +210,13 @@ func Convolve(xs, ys []float64) []float64 {
 	return rs
 }
 
-func ConvolveSame(xs, ys []float64) []float64 {
-	var convLen, sumLen = len(xs), len(ys)
-	if convLen > sumLen {
-		ys = append(ys, make([]float64, convLen-sumLen)...)
-	} else {
-		convLen, sumLen = sumLen, convLen
-		xs = append(xs, make([]float64, convLen-sumLen)...)
-	}
-	var rs = make([]float64, convLen)
-	var nodeSum float64
-	var i, j int
-	for i = 0; i < convLen; i++ {
-		for j = 0; j < sumLen; j++ {
-			if i-j < 0 {
-				continue
-			}
-			nodeSum += xs[i-j] * ys[j]
-		}
-		rs[i] = nodeSum
-		nodeSum = 0
-	}
-	return rs
-}
-
+// FastConvolve - Linear fast convolution
 func FastConvolve(xs, ys []float64) []float64 {
 	L := len(xs)
 	N := len(ys)
 	M := N + L - 1
 
+	// zero padding
 	xsz := append(xs, make([]float64, M-L)...)
 	ysz := append(ys, make([]float64, M-N)...)
 
