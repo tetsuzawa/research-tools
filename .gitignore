@@ -1,0 +1,51 @@
+# ********* GO *********
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# ********* Python *********
+__chche__
+*chche*
+__pycache__
+venv
+.ipynb_checkpoints
+*.code-workspace
+*.aup
+
+# ********* Research *********
+# Research data files
+*.sofa
+*.wav
+*.DSB
+*.DDB
+*.csv
+*.png
+*.jpg
+*.JPG
+*.gif
+*.json
+*.DDA
+*.DDB
+*.DSB
+*.csv
+*.pptx
+
+# Useless
+*.idea/
+.idea/
+.idea
+*.pdf
+*.DS_store
+.DS_store
+
+bin/
+build/
