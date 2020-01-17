@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 import argparse
 import pathlib
 
-import soundfile as sf
 import numpy as np
+import soundfile as sf
 
 
 def main():
@@ -13,12 +13,8 @@ def main():
 
     parser.add_argument('duration',
                         action='store',
-                        nargs=None,
-                        const=None,
-                        default=None,
-                        type=str,
-                        help='The length of noise.',
-                        metavar=None)
+                        type=float,
+                        help='The length of noise.')
 
     parser.add_argument('-d', '--dst_path',
                         action='store',
@@ -26,15 +22,14 @@ def main():
                         const="/tmp",
                         default=".",
                         type=str,
-                        help='Directory path where you want to locate output files. (default: current directory)',
-                        metavar=None)
+                        help='Directory path where you want to locate output files. (default: current directory)')
 
     args = parser.parse_args()
     duration = args.duration
     output_dir = pathlib.Path(args.dst_path)
     output_name = pathlib.Path.joinpath(output_dir, f"white_noise_{duration}s.wav")
 
-    sig = np.random.rand(int(float(duration) * 48000))
+    sig = np.random.rand(int(duration * 48000))
 
     sf.write(file=str(output_name), data=sig, samplerate=48000, endian="LITTLE", format="WAV", subtype="PCM_16")
 

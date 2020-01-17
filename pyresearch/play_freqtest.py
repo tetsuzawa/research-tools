@@ -1,13 +1,11 @@
-# /usr/bin/python
+#!/usr/bin/env python
 # coding: utf-8
-import sys
 import struct
+import sys
 
-import pyaudio
 import numpy as np
+import pyaudio
 
-
-# classとか関数書く
 
 def play(stream, data):  # 再生用関数、ストリームと波形データを引数に
 

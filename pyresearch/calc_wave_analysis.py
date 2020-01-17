@@ -1,12 +1,6 @@
 # %%
 import sys
 
-import numpy as np
-
-sys.path.append('./')
-sys.path.append('/Users/tetsu/personal_files/Research')
-sys.path.append('/Users/tetsu/personal_files/Research/research_tools')
-
 from modules.wave_handler_multi_ch import WaveHandler
 # from wave_process import WaveHandler
 from modules.plot_tools import PlotTools
@@ -26,7 +20,7 @@ Example:
 
 
 def get_nearest_value(target_list, v):
-    if 1 > len(target_list):
+    if len(target_list) < 1:
         return -1
 
     idx = 0
