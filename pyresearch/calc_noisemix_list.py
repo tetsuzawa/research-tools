@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 import argparse
 import array
 import os
-import numpy as np
 import random
 import wave
+
+import numpy as np
 
 
 def get_args():
@@ -12,9 +13,6 @@ def get_args():
     parser.add_argument('--clean_file', type=str, required=True)
     parser.add_argument('--noise_file', type=str, required=True)
     parser.add_argument('--output_dir', type=str, required=True)
-    # parser.add_argument('--output_mixed_dir', type=str, default='', required=True)
-    # parser.add_argument('--output_clean_dir', type=str, default='')
-    # parser.add_argument('--output_noise_dir', type=str, default='')
     parser.add_argument('--snr_start', type=float, default='', required=True)
     parser.add_argument('--snr_end', type=float, default='', required=True)
     parser.add_argument('--snr_div_num', type=float, default='', required=True)

@@ -1,10 +1,7 @@
 # coding:utf-8
 import sys
 
-import numpy as np
-import wave
-
-from wave_handler_multi_ch import WaveHandler
+import soundfile as sf
 
 
 def main():
@@ -16,33 +13,14 @@ def main():
     print("input: ", filename)
     print("output L: ", filename_L)
     print("output R: ", filename_R)
-    # %%
-    stereo_wav = WaveHandler(filename)
 
-    # %%
-    mono_L = stereo_wav.data[::2]
-    mono_R = stereo_wav.data[1::2]
+    data, fs = sf.read(filename)
+    mono_L = data[:, 0]
+    mono_R = data[:, 1]
 
-    # %%
+    sf.write(file=filename_L, data=mono_L, samplerate=48000, endian="LITTLE", format="WAV", subtype="PCM_16")
+    sf.write(file=filename_R, data=mono_R, samplerate=48000, endian="LITTLE", format="WAV", subtype="PCM_16")
 
-    # %%
-    L = WaveHandler()
-    R = WaveHandler()
-
-    # %%
-    L.ch = 1
-    L.width = 2
-    L.fs = 48000
-    R.ch = 1
-    R.width = 2
-    R.fs = 48000
-
-    # %%
-
-    L.wave_write(filename_L, mono_L)
-    R.wave_write(filename_R, mono_R)
-
-    # %%
     print("done")
 
 
