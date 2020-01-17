@@ -1,41 +1,39 @@
-# %%
+# coding: utf-8
+
+
 import sys
-import os.path
+
+import librosa
 import numpy as np
+import soundfile as sf
 
 
 def main():
-    current_dir = os.path.dirname(os.path.abspath("__file__"))
-    sys.path.append(str(current_dir) + '/research_tools')
-    sys.path.append(str(current_dir) + '/sample_wav')
+    input_file_path = sys.argv[1]
+    noise_file_path = sys.argv[2]
+    output_file_path = sys.argv[3]
 
-    try:
-        from modules.wave_process import WaveHandler
+    print('input file:', input_file_path)
+    data, data_fs = librosa.load(input_file_path, sr=None, mono=True)
+    data_st = librosa.stft(data)
+    data_st_abs = np.abs(data_st)
+    angle = np.angle(data_st)
+    b = np.exp(1.0j * angle)
 
-    except ModuleNotFoundError as err:
-        print(err)
-        raise ModuleNotFoundError
+    print('noise file:', noise_file_path)
+    noise_data, noise_fs = librosa.load(noise_file_path, sr=None, mono=True)
+    noise_data_st = librosa.stft(noise_data)
+    noise_data_st_abs = np.abs(noise_data_st)
+    mean_noise_abs = np.mean(noise_data_st_abs, axis=1)
 
-    args = sys.argv
+    subtracted_data = data_st_abs - mean_noise_abs.reshape(
+        (mean_noise_abs.shape[0], 1))  # reshape for broadcast to subtract
+    subtracted_data_phase = subtracted_data * b  # apply phase information
+    y = librosa.istft(subtracted_data_phase)  # back to time domain signal
 
-    noise_wav_name = args[1]
-    dst_wav_name = args[2]
-    out_wav_name = args[3]
-
-    noise_wav = WaveHandler(filename=noise_wav_name)
-    dst_wav = WaveHandler(filename=dst_wav_name)
-    out_wav = WaveHandler()
-
-    noise_y = np.array(noise_wav.data)
-    dst_y = np.array(dst_wav.data)
-
-    noise_Y = np.fft.fft(noise_y)
-    dst_Y = np.fft.fft(dst_y)
-    out_Y = dst_Y - noise_Y
-
-    out_wav_data = np.fft.ifft(out_Y)
-
-    out_wav.wave_write(out_wav_name, np.real(out_wav_data))
+    # save as a wav file
+    sf.write(file=str(output_file_path), data=y, samplerate=data_fs, endian="LITTLE", format="WAV", subtype="PCM_16")
+    print('output file:', output_file_path)
 
 
 if __name__ == '__main__':
