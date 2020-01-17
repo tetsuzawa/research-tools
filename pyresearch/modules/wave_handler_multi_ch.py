@@ -1,6 +1,7 @@
 # coding:utf-8
-import numpy as np
 import wave
+
+import numpy as np
 
 
 class WaveHandler(object):
