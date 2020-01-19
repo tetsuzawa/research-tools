@@ -33,7 +33,7 @@ func main() {
 
 		fmt.Printf("working... %d%%\r", (i+1)*100/(len(es)-tap))
 
-		v, err = goresearch.MSE(es[i:i+tap], nil)
+		v, err = goresearch.CalcMSE(es[i:i+tap], nil)
 		check(err)
 		mse[i] = 20 * math.Log10(v)
 	}
