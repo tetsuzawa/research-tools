@@ -3,15 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-audio/audio"
-	"github.com/go-audio/wav"
-	"gonum.org/v1/gonum/floats"
 	"log"
 	"math"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/go-audio/audio"
+	"github.com/go-audio/wav"
+	"gonum.org/v1/gonum/floats"
+
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 func main() {
@@ -86,14 +89,14 @@ func main() {
 		panic(err)
 	}
 
-	cleanAMP := IntsToFloat64s(buf1.Data)
-	noiseAMP := IntsToFloat64s(buf2.Data)
+	cleanAMP := goresearch.IntsToFloat64s(buf1.Data)
+	noiseAMP := goresearch.IntsToFloat64s(buf2.Data)
 
-	cleanRMS := CalcRMS(cleanAMP)
+	cleanRMS := goresearch.CalcRMS(cleanAMP)
 
 	var start int
 	var cutNoiseAmp []float64
-	if len(cleanAMP) == len(noiseAMP){
+	if len(cleanAMP) == len(noiseAMP) {
 		start = 0
 		cutNoiseAmp = noiseAMP[start : start+len(cleanAMP)]
 	} else if len(cleanAMP) > len(noiseAMP) {
@@ -104,8 +107,8 @@ func main() {
 		start = rand.Intn(len(noiseAMP) - len(cleanAMP))
 		cutNoiseAmp = noiseAMP[start : start+len(cleanAMP)]
 	}
-	noiseRMS := CalcRMS(cutNoiseAmp)
-	snrList := LinSpace(snrStart, snrEnd, snrDiv)
+	noiseRMS := goresearch.CalcRMS(cutNoiseAmp)
+	snrList := goresearch.LinSpace(snrStart, snrEnd, snrDiv)
 
 	var (
 		adjustedNoiseAmp = make([]float64, len(cutNoiseAmp))
@@ -123,13 +126,13 @@ func main() {
 	wBuf.SourceBitDepth = bitDepth1
 	for _, snr := range snrList {
 
-		adjustedNoiseRMS := CalcAdjustedRMS(cleanRMS, snr)
+		adjustedNoiseRMS := goresearch.CalcAdjustedRMS(cleanRMS, snr)
 
 		for i, v := range cutNoiseAmp {
 			adjustedNoiseAmp[i] = v * (adjustedNoiseRMS / noiseRMS)
 			mixedAmp[i] = cleanAMP[i] + adjustedNoiseAmp[i]
 		}
-		maxAmp := floats.Max(AbsFloat64s(mixedAmp))
+		maxAmp := floats.Max(goresearch.AbsFloat64s(mixedAmp))
 		if maxAmp > math.MaxInt16+1 {
 			reductionRate := math.MaxInt16 / maxAmp
 			for i, _ := range cutNoiseAmp {
@@ -137,16 +140,9 @@ func main() {
 			}
 		}
 
-		wBuf.Data = Float64sToInts(mixedAmp)
-		//dataCopy := make([]int, len(wBuf.Data))
-		//copy(dataCopy, wBuf.Data)
-		//sort.Ints(AbsInts(dataCopy))
-		//log.Println("Clip judge!!")
-		//if dataCopy[0] < math.MinInt16 || dataCopy[len(dataCopy)-1] > math.MaxInt16 {
-		//	log.Fatalln("Clip!!")
-		//}
+		wBuf.Data = goresearch.Float64sToInts(mixedAmp)
 
-		outputName, _ = splitPathAndExt(cleanFilepath)
+		outputName, _ = goresearch.SplitPathAndExt(cleanFilepath)
 		outputPath = filepath.Join(outputDir, filepath.Base(outputName)+"_snr"+strconv.Itoa(int(snr))+".wav")
 		fw, err = os.Create(outputPath)
 		check(err)
@@ -163,6 +159,5 @@ func main() {
 func check(err error) {
 	if err != nil {
 		panic(err)
-		//log.Fatalln(err)
 	}
 }

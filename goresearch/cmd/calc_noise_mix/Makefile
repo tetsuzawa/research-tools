@@ -1,4 +1,4 @@
-BIN_NAME="csv_to_wav"
+BIN_NAME="calc_noise_mix"
 
 .PHONY: build
 build:
