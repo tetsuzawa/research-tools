@@ -15,6 +15,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
+
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 func main() {
@@ -42,7 +44,7 @@ func action(ctx *cli.Context) error {
 	}
 
 	fileName := ctx.Args().Get(0)
-	name, ext := splitPathAndExt(fileName)
+	name, ext := goresearch.SplitPathAndExt(fileName)
 
 	if ext != ".wav" {
 		return cli.NewExitError("incorrect file format. need .wav file. \nUsage: wav-to-DSB-multi /path/to/file.wav", 2)
@@ -50,7 +52,7 @@ func action(ctx *cli.Context) error {
 
 	if ctx.String("o") != "" {
 		argName := ctx.String("o")
-		name, _ = splitPathAndExt(argName)
+		name, _ = goresearch.SplitPathAndExt(argName)
 	}
 
 	f, err := os.Open(fileName)

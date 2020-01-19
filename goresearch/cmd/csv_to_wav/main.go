@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tetsuzawa/go-research/tools"
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 func main() {
@@ -21,29 +21,27 @@ func main() {
 
 	flag.Parse()
 
-	if csvPath == ""{
+	if csvPath == "" {
 		fmt.Printf("please specify csv path\n\n")
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	name, ext := tools.SplitPathAndExt(csvPath)
-	if ext != ".csv"{
+	name, ext := goresearch.SplitPathAndExt(csvPath)
+	if ext != ".csv" {
 		fmt.Printf("please specify csv path\n\n")
 		flag.Usage()
 		os.Exit(1)
 	}
-
 
 	fmt.Println("csvPath:", csvPath)
 	fmt.Println("dataDir:", dataDir)
 
-	_, _, e := tools.ReadDataFromCSV(csvPath)
+	_, _, e := goresearch.ReadDataFromCSV(csvPath)
 
 	outputName := filepath.Base(name)
 
-	data := tools.NormToMaxInt16(e)
+	data := goresearch.NormToMaxInt16(e)
 
-	tools.SaveDataToWav(data, dataDir, outputName)
-
+	goresearch.SaveDataAsWav(data, dataDir, outputName)
 }

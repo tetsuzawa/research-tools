@@ -6,13 +6,12 @@ import (
 	"log"
 	"math"
 	"os"
-	"path/filepath"
 
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
 	"gonum.org/v1/gonum/floats"
 
-	tools "github.com/tetsuzawa/go-research"
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 func main() {
@@ -20,33 +19,33 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	var (
-		wavFilepath1 string
-		wavFilepath2 string
-		outputDir    string
+		inputFilePath1 string
+		inputFilePath2 string
+		outputFilePath string
 	)
 
-	flag.StringVar(&wavFilepath1, "x", "/path/to/name.wav", "designate wav file path")
-	flag.StringVar(&wavFilepath2, "y", "/path/to/name.wav", "designate wav file path")
-	flag.StringVar(&outputDir, "o", "/path/to/dir/", "designate ouput directory")
+	flag.StringVar(&inputFilePath1, "x", "/path/to/name.wav", "designate input wav file path")
+	flag.StringVar(&inputFilePath2, "y", "/path/to/name.wav", "designate input wav file path")
+	flag.StringVar(&outputFilePath, "o", "/path/to/name.wav", "designate output wav file path")
 
 	flag.Parse()
 
-	if wavFilepath1 == "/path/to/name.wav" ||
-		wavFilepath2 == "/path/to/name.wav" ||
-		outputDir == "/path/to/dir/" {
+	if inputFilePath1 == "/path/to/name.wav" ||
+		inputFilePath2 == "/path/to/name.wav" ||
+		outputFilePath == "/path/to/name.wav" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	fmt.Println("wav 1 file path:", wavFilepath1)
-	fmt.Println("wav 2 file path:", wavFilepath2)
-	fmt.Println("ouput directory:", outputDir)
+	fmt.Println("wav_1 file path:", inputFilePath1)
+	fmt.Println("wav_2 file path:", inputFilePath2)
+	fmt.Println("output file path:", outputFilePath)
 
-	f1, err := os.Open(wavFilepath1)
+	f1, err := os.Open(inputFilePath1)
 	check(err)
 	w1 := wav.NewDecoder(f1)
 
-	f2, err := os.Open(wavFilepath2)
+	f2, err := os.Open(inputFilePath2)
 	check(err)
 	w2 := wav.NewDecoder(f2)
 
@@ -79,17 +78,17 @@ func main() {
 		panic(err)
 	}
 
-	amp1 := tools.IntsToFloat64s(buf1.Data)
-	amp2 := tools.IntsToFloat64s(buf2.Data)
+	amp1 := goresearch.IntsToFloat64s(buf1.Data)
+	amp2 := goresearch.IntsToFloat64s(buf2.Data)
 
-	amp_out := tools.Convolve(amp1, amp2)
+	ampOut := goresearch.Convolve(amp1, amp2)
 
 	var (
-		fw         *os.File
-		ww         *wav.Encoder
-		wBuf       = new(audio.IntBuffer)
-		outputName string
-		outputPath string
+		fw             *os.File
+		ww             *wav.Encoder
+		wBuf           = new(audio.IntBuffer)
+		outputFileName string
+		outputPath_1   string
 	)
 
 	wBuf.Format = &audio.Format{
@@ -98,26 +97,20 @@ func main() {
 	}
 	wBuf.SourceBitDepth = bitDepth1
 
-	maxAmp := floats.Max(tools.AbsFloat64s(amp_out))
+	maxAmp := floats.Max(goresearch.AbsFloat64s(ampOut))
 	if maxAmp > math.MaxInt16+1 {
 		reductionRate := math.MaxInt16 / maxAmp
-		for i, _ := range amp_out {
-			amp_out[i] *= reductionRate
+		for i, _ := range ampOut {
+			ampOut[i] *= reductionRate
 		}
 	}
 
-	wBuf.Data = tools.Float64sToInts(amp_out)
-	//dataCopy := make([]int, len(wBuf.Data))
-	//copy(dataCopy, wBuf.Data)
-	//sort.Ints(AbsInts(dataCopy))
-	//log.Println("Clip judge!!")
-	//if dataCopy[0] < math.MinInt16 || dataCopy[len(dataCopy)-1] > math.MaxInt16 {
-	//	log.Fatalln("Clip!!")
-	//}
+	wBuf.Data = goresearch.Float64sToInts(ampOut)
 
-	outputName, _ = tools.SplitPathAndExt(wavFilepath1)
-	outputPath = filepath.Join(outputDir, filepath.Base(outputName)+".wav")
-	fw, err = os.Create(outputPath)
+	outputFileName, _ = goresearch.SplitPathAndExt(outputFilePath)
+
+	outputPath_1 = outputFileName + ".wav"
+	fw, err = os.Create(outputPath_1)
 	check(err)
 	ww = wav.NewEncoder(fw, fs1, bitDepth1, ch1, 1)
 	err = ww.Write(wBuf)

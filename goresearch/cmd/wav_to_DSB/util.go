@@ -1,15 +1,5 @@
 package main
 
-import "path/filepath"
-
-func getFileNameWithoutExt(path string) string {
-	return filepath.Base(path[:len(path)-len(filepath.Ext(path))])
-}
-
-func splitPathAndExt(path string) (string, string) {
-	return filepath.Join(filepath.Dir(filepath.Clean(path)), filepath.Base(path[:len(path)-len(filepath.Ext(path))])), filepath.Ext(path)
-}
-
 var HelpTemplate = `NAME:
    {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
 

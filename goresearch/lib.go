@@ -2,6 +2,7 @@ package goresearch
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -88,7 +89,7 @@ func ReadDataFromWav(name string) []int {
 	return buf.Data
 }
 
-func SaveDataToWav(data []float64, dataDir string, name string) {
+func SaveDataAsWav(data []float64, dataDir string, name string) {
 	outputPath := filepath.Join(dataDir, name+".wav")
 	fw, err := os.Create(outputPath)
 	check(err)
@@ -119,6 +120,42 @@ func SaveDataToWav(data []float64, dataDir string, name string) {
 	check(err)
 
 	fmt.Printf("\nwav file saved at: %v\n", outputPath)
+}
+
+func SaveDataAsCSV(d, y, e, mse []float64, dataDir string, testName string) {
+	n := len(d)
+	fw, err := os.Create(filepath.Join(dataDir, testName+".csv"))
+	check(err)
+	writer := bufio.NewWriter(fw)
+	for i := 0; i < n; i++ {
+		if i >= len(mse) {
+			_, err = fmt.Fprintf(writer, "%g,%g,%g\n", d[i], y[i], e[i])
+			check(err)
+			continue
+		}
+		_, err = fmt.Fprintf(writer, "%g,%g,%g,%g\n", d[i], y[i], e[i], mse[i])
+		check(err)
+	}
+	err = writer.Flush()
+	check(err)
+	err = fw.Close()
+	check(err)
+}
+
+func MSE(a []float64, b []float64) (float64, error) {
+	if b == nil {
+		b = make([]float64, len(a))
+	} else if len(a) != len(b) {
+		return 0, errors.New("length of a and b must agree")
+	}
+
+	var sum float64
+	for i := 0; i < len(a); i++ {
+		sum += (a[i] - b[i]) * (a[i] - b[i])
+	}
+
+	return sum / float64(len(a)), nil
+
 }
 
 func NormToMaxInt16(data []float64) []float64 {
@@ -167,6 +204,14 @@ func LinSpace(start, end float64, n int) []float64 {
 		res[i] = start + (delta * float64(i))
 	}
 	return res
+}
+
+func Int16sToInts(i16s []int16) []int {
+	var is = make([]int, len(i16s))
+	for i, v := range i16s {
+		is[i] = int(v)
+	}
+	return is
 }
 
 func Float64sToInts(fs []float64) []int {

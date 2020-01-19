@@ -4,10 +4,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	research "github.com/tetsuzawa/go-research/ADF/automatic_equalizer"
 	"os"
 	"path/filepath"
 )
+
+type ADFConfig struct {
+	WavName string  `json:"wav_name"`
+	AdfName string  `json:"adf_name"`
+	Mu      float64 `json:"mu"`
+	L       int     `json:"l"`
+	Order   int     `json:"order"`
+}
 
 func main() {
 	var (
@@ -55,7 +62,7 @@ func main() {
 	}
 	fmt.Printf("testName: %v\n", testName)
 
-	var adf = &research.OptStepADF{
+	var adf = &ADFConfig{
 		WavName: wavName,
 		AdfName: adfName,
 		Mu:      Mu,

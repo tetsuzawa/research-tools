@@ -22,6 +22,8 @@ import (
 	"github.com/gordonklaus/portaudio"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
+
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 const (
@@ -50,7 +52,7 @@ Usage: multirecord (-c ch -r rate -b bits -o /path/to/out.wav) duration
 	}
 
 	// ************* validate ext *************
-	name, ext := splitPathAndExt(ctx.String("o"))
+	name, ext := goresearch.SplitPathAndExt(ctx.String("o"))
 	if ext != ".wav" && ext != "" {
 		return cli.NewExitError(`incorrect file format. multirecord saves audio as .wav file.
 Usage: multirecord -o /path/to/file.wav 5.0`, 2)
@@ -177,13 +179,13 @@ func callback(inBuf, outBuf []int16) {
 	if NumWritten+FramesPerBuffer > NumSamplesToWrite {
 		numWrite := NumSamplesToWrite - NumWritten
 		NumWritten += numWrite
-		aBuf.Data = int16sToInts(inBuf[:numWrite])
+		aBuf.Data = goresearch.Int16sToInts(inBuf[:numWrite])
 		err = w1.Write(aBuf)
 		check(err)
 		return
 	}
 	NumWritten += len(inBuf) / NumChannels
-	aBuf.Data = int16sToInts(inBuf)
+	aBuf.Data = goresearch.Int16sToInts(inBuf)
 	err = w1.Write(aBuf)
 	check(err)
 }
