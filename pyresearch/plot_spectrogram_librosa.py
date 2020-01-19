@@ -1,27 +1,25 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import os
 import argparse
 import pathlib
 
-import numpy as np
-import soundfile as sf
 import librosa
 import librosa.display
 import matplotlib
+import numpy as np
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 plt.rcParams['font.family'] = 'IPAPGothic'
+plt.rcParams['font.size'] = 16
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 plt.rcParams['xtick.major.width'] = 1.0
 plt.rcParams['ytick.major.width'] = 1.0
-plt.rcParams['font.size'] = 16
 plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
 plt.rcParams['figure.dpi'] = 300
@@ -30,13 +28,11 @@ plt.rcParams['figure.subplot.wspace'] = 0.3
 
 
 def main():
-    parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
+    description = "This script plots graph from a csv file with 3 columns."
+    parser = argparse.ArgumentParser(description=description)
 
     parser.add_argument('input_path',
                         action='store',
-                        nargs=None,
-                        const=None,
-                        default=None,
                         type=str,
                         help='Directory path where the input file is located.',
                         metavar=None)
@@ -46,7 +42,6 @@ def main():
                         nargs='?',
                         const="/tmp",
                         default=".",
-                        # default=None,
                         type=str,
                         help='Directory path where you want to locate img files. (default: current directory)',
                         metavar=None)
@@ -57,34 +52,27 @@ def main():
 
     args = parser.parse_args()
 
-    input_path = pathlib.Path(args.input_path).absolute()
-    input_name_list = str(input_path).split(".")
-
-    output_dir = pathlib.Path(args.dst_path).absolute()
-
+    input_path = pathlib.Path(args.input_path)
+    output_dir = pathlib.Path(args.dst_path)
     is_logarithm = args.log
 
-    #####################
-    # TODO issue
-    with sf.SoundFile(input_path) as sf_desc:
-        sr_native = sf_desc.samplerate
-        print(sr_native)
-    #####################
+    y, sr = librosa.load(str(input_path), sr=None)
 
-    y, sr = librosa.load(str(input_path), sr=sr_native)
-
-    D = np.abs(librosa.stft(y))
-    log_D = librosa.amplitude_to_db(D, ref=np.max)
+    d = np.abs(librosa.stft(y))
+    log_D = librosa.amplitude_to_db(d, ref=np.max)
 
     plt.figure(figsize=(8, 7))
     if is_logarithm:
         librosa.display.specshow(log_D, sr=sr, x_axis='time', y_axis='log')
+        librosa.display.specshow(log_D, sr=sr, x_axis='time', y_axis='log')
     else:
-        librosa.display.specshow(log_D, sr=sr, x_axis='time', y_axis='linear')
+        librosa.display.specshow(log_D, sr=sr, x_axis='s', y_axis='linear')
 
     plt.set_cmap("inferno")
-    plt.title('Spectroram')
-    plt.colorbar(format='%+02.0f dB')
+    plt.xlabel("Time [sec]")
+    plt.ylabel("Frequency [Hz]")
+    plt.title('Spectrogram')
+    plt.colorbar(format='%2.0f dB')
     plt.tight_layout()
     plt.show()
 

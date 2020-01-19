@@ -1,13 +1,7 @@
-import struct
-import sys
 import os.path
-import pandas as pd
-import matplotlib.pyplot as plt
-import wave
-from scipy import fromstring, int16, frombuffer
+import sys
 
 # self made module
-import modules.wave_process
 from modules.plot_tools import plot_tool
 
 
