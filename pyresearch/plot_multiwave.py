@@ -1,22 +1,32 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# coding: utf-8
 
 # Usage:
 #   python3 plot_multiwave.py foo.wav
 # then you can see the wave's abstruct
 
+import signal
 import sys
 import wave
 
-import signal
+import matplotlib.pyplot as plt
+import numpy as np
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-import numpy as np
-import matplotlib.pyplot as plt
-
+plt.rcParams['font.family'] = 'IPAPGothic'
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+plt.rcParams['xtick.top'] = True
+plt.rcParams['ytick.right'] = True
+plt.rcParams['xtick.major.width'] = 1.0
+plt.rcParams['ytick.major.width'] = 1.0
+plt.rcParams['font.size'] = 11
+plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
-plt.rcParams['figure.dpi'] = 100  # dpiの設定
+plt.rcParams['figure.dpi'] = 300
+plt.rcParams['figure.subplot.hspace'] = 0.3
+plt.rcParams['figure.subplot.wspace'] = 0.3
 
 
 def main():
@@ -30,22 +40,9 @@ def main():
     for i in range(len(args) - 1):
         wf = wave.open(args[i + 1], "r")
         buf = wf.readframes(wf.getnframes())
+        wf.close()
 
         f = np.frombuffer(buf, dtype="int16")
-        # F = np.fft.fft(f)
-        #
-        # F_abs = np.abs(F)
-        # N = len(F_abs)
-        # F_abs_amp = F_abs / N * 2
-        # F_abs_amp[0] = F_abs_amp[0] / 2
-        #
-        # fig, (axf, axF) = plt.subplots(ncols=2)
-        #
-        # axf.plot(f)
-        # axF.set_xscale("log")
-        # axF.plot(F_abs_amp[:int(len(F_abs_amp / 2))])
-        # axf.grid()
-        # axF.grid()
 
         plt.plot(f, alpha=0.5, label=args[i + 1])
         plt.legend()

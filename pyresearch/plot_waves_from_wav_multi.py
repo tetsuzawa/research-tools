@@ -19,7 +19,7 @@ plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 plt.rcParams['xtick.major.width'] = 1.0
 plt.rcParams['ytick.major.width'] = 1.0
-plt.rcParams['font.size'] = 11
+plt.rcParams['font.size'] = 16
 plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
 plt.rcParams['figure.dpi'] = 300
@@ -63,9 +63,9 @@ def main():
         if i == 2:
             data *= 0.3
 
-        ax.plot(data, "b")
+        ax.plot(data)
         ax.set_ylim(-1,1)
-        ax.set_xlabel("iteration")
+        ax.set_xlabel("Iteration")
         plt.tight_layout()
         plt.grid()
 

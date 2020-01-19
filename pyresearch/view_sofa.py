@@ -16,7 +16,6 @@ def main():
 
     parser.add_argument('sofa_path',
                         action='store',
-                        nargs=None,
                         const=None,
                         default=None,
                         type=str,

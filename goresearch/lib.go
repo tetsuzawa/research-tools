@@ -15,6 +15,20 @@ import (
 	"gonum.org/v1/gonum/floats"
 )
 
+func CalcAdjustedRMS(cleanRMS float64, snr float64) (noiseRMS float64) {
+	a := snr / 20
+	noiseRMS = cleanRMS / (math.Pow(10, a))
+	return noiseRMS
+}
+
+func CalcRMS(amp []float64) float64 {
+	var sum float64
+	for _, v := range amp {
+		sum += v * v
+	}
+	return math.Sqrt(sum / float64(len(amp)))
+}
+
 func ReadDataFromCSV(inputPath string) (ds []float64, ys []float64, es []float64) {
 	fr, err := os.Open(inputPath)
 	check(err)
