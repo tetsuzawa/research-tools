@@ -1,4 +1,4 @@
-BIN_NAME="fast_convolve_wav"
+BIN_NAME="csv_to_wav"
 
 .PHONY: build
 build:

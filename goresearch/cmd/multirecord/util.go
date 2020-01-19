@@ -1,25 +1,10 @@
 package main
 
-import (
-	"path/filepath"
-)
-
-func int16sToInts(i16s []int16) []int {
-	var is = make([]int, len(i16s))
-	for i, v := range i16s {
-		is[i] = int(v)
-	}
-	return is
-}
 
 func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func splitPathAndExt(path string) (string, string) {
-	return filepath.Join(filepath.Dir(filepath.Clean(path)), filepath.Base(path[:len(path)-len(filepath.Ext(path))])), filepath.Ext(path)
 }
 
 var HelpTemplate = `NAME:

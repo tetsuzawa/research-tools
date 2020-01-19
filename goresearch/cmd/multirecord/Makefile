@@ -1,4 +1,4 @@
-BIN_NAME="dr_json"
+BIN_NAME="multirecord"
 
 .PHONY: build
 build:

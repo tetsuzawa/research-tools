@@ -1,4 +1,4 @@
-BIN_NAME="dr_json"
+BIN_NAME="wav_to_DSB"
 
 .PHONY: build
 build:

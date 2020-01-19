@@ -11,7 +11,7 @@ import (
 	"github.com/go-audio/wav"
 	"gonum.org/v1/gonum/floats"
 
-	tools "github.com/tetsuzawa/go-research"
+	"github.com/tetsuzawa/research-tools/goresearch"
 )
 
 func main() {
@@ -78,10 +78,10 @@ func main() {
 		panic(err)
 	}
 
-	amp1 := tools.IntsToFloat64s(buf1.Data)
-	amp2 := tools.IntsToFloat64s(buf2.Data)
+	amp1 := goresearch.IntsToFloat64s(buf1.Data)
+	amp2 := goresearch.IntsToFloat64s(buf2.Data)
 
-	amp_out := tools.FastConvolve(amp1, amp2)
+	ampOut := goresearch.FastConvolve(amp1, amp2)
 
 	var (
 		fw             *os.File
@@ -97,24 +97,17 @@ func main() {
 	}
 	wBuf.SourceBitDepth = bitDepth1
 
-	maxAmp := floats.Max(tools.AbsFloat64s(amp_out))
+	maxAmp := floats.Max(goresearch.AbsFloat64s(ampOut))
 	if maxAmp > math.MaxInt16+1 {
 		reductionRate := math.MaxInt16 / maxAmp
-		for i, _ := range amp_out {
-			amp_out[i] *= reductionRate
+		for i, _ := range ampOut {
+			ampOut[i] *= reductionRate
 		}
 	}
 
-	wBuf.Data = tools.Float64sToInts(amp_out)
-	//dataCopy := make([]int, len(wBuf.Data))
-	//copy(dataCopy, wBuf.Data)
-	//sort.Ints(AbsInts(dataCopy))
-	//log.Println("Clip judge!!")
-	//if dataCopy[0] < math.MinInt16 || dataCopy[len(dataCopy)-1] > math.MaxInt16 {
-	//	log.Fatalln("Clip!!")
-	//}
+	wBuf.Data = goresearch.Float64sToInts(ampOut)
 
-	outputFileName, _ = tools.SplitPathAndExt(outputFilePath)
+	outputFileName, _ = goresearch.SplitPathAndExt(outputFilePath)
 
 	outputPath_1 = outputFileName + ".wav"
 	fw, err = os.Create(outputPath_1)
