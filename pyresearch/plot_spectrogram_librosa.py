@@ -8,6 +8,7 @@ import librosa
 import librosa.display
 import matplotlib
 import numpy as np
+import pandas as pd
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ plt.rcParams['figure.subplot.wspace'] = 0.3
 
 
 def main():
-    description = "This script plots graph from a csv file with 3 columns."
+    description = "This script plots spectrogram from csv or wav file."
     parser = argparse.ArgumentParser(description=description)
 
     parser.add_argument('input_path',
@@ -56,9 +57,18 @@ def main():
     output_dir = pathlib.Path(args.dst_path)
     is_logarithm = args.log
 
-    y, sr = librosa.load(str(input_path), sr=None)
+    sr = 48000
+    data = []
+    if input_path.suffix == ".wav":
+        data, sr = librosa.load(str(input_path), sr=None)
+    elif input_path.suffix == ".csv":
+        df = pd.read_csv(str(input_path), header=None)
+        data = np.array(df[0], dtype=np.float)
+    else:
+        parser.usage()
+        exit(1)
 
-    d = np.abs(librosa.stft(y))
+    d = np.abs(librosa.stft(data))
     log_D = librosa.amplitude_to_db(d, ref=np.max)
 
     plt.figure(figsize=(8, 7))

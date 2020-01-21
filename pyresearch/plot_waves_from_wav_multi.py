@@ -1,13 +1,10 @@
 # encording: utf-8
 
-import os
-import sys
 import argparse
 import pathlib
+import signal
 
-import numpy as np
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import soundfile as sf
@@ -28,6 +25,8 @@ plt.rcParams['figure.subplot.wspace'] = 0.3
 
 
 def main():
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     parser = argparse.ArgumentParser(description="This script plots graph from a csv file with 3 columns.")
 
     parser.add_argument('input_paths',
@@ -64,7 +63,7 @@ def main():
             data *= 0.3
 
         ax.plot(data)
-        ax.set_ylim(-1,1)
+        ax.set_ylim(-1, 1)
         ax.set_xlabel("Iteration")
         plt.tight_layout()
         plt.grid()
