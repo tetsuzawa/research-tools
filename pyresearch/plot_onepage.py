@@ -62,7 +62,7 @@ def main():
     fig, ax = plt.subplots(3, 3, figsize=(14, 14))
 
     # ******************* band control *******************
-    filter1 = signal.firwin(numtaps=512, cutoff=8000, width=None, pass_zero="lowpass", window='hamming', nyq=None, fs=48000)
+    # filter1 = signal.firwin(numtaps=512, cutoff=8000, width=None, pass_zero="lowpass", window='hamming', nyq=None, fs=48000)
     # ******************* band control *******************
 
     for i, SNR in enumerate(SNR_list):
@@ -78,16 +78,15 @@ def main():
                 mse = df[3]
 
                 # ******************* band control *******************
-                mse_8kHz_lpf = signal.lfilter(filter1, 1, mse)
-                print("lpf")
+                # mse = signal.lfilter(filter1, 1, mse)
+                # print("lpf")
                 # ******************* band control *******************
 
-                # ax[i, j].plot(mse[:sample], colors[k], alpha=0.5, label=ALGO)
-                ax[i, j].plot(mse_8kHz_lpf[:sample], colors[k], alpha=0.5, label=ALGO)
+                ax[i, j].plot(mse[:sample], colors[k], alpha=0.5, label=ALGO)
 
                 # ax[i, j].legend()
-                # ax[i, j].set_ylabel("MSE [dB]")
-                # ax[i, j].set_xlabel("Iteration")
+                ax[i, j].set_ylabel("MSE [dB]")
+                ax[i, j].set_xlabel("Iteration")
 
                 # *********** legend ************
                 # box = ax[i, j].get_position()

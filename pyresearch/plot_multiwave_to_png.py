@@ -47,6 +47,8 @@ def main():
         input_path = pathlib.Path(input_path)
 
         plt.plot(data, alpha=0.5, label=input_path.stem)
+        plt.xlabel("Sample")
+        plt.ylabel("Amplitude")
         plt.legend()
         plt.tight_layout()
         plt.grid()

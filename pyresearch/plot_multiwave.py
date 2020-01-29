@@ -16,13 +16,13 @@ import soundfile as sf
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 plt.rcParams['font.family'] = 'IPAPGothic'
+plt.rcParams['font.size'] = 11
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 plt.rcParams['xtick.major.width'] = 1.0
 plt.rcParams['ytick.major.width'] = 1.0
-plt.rcParams['font.size'] = 11
 plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['figure.figsize'] = (8, 7)
 plt.rcParams['figure.dpi'] = 300
@@ -42,6 +42,8 @@ def main():
         data, sr = sf.read(args[i + 1])
 
         plt.plot(data, alpha=0.5, label=args[i + 1])
+        plt.xlabel("Sample")
+        plt.ylabel("Amplitude")
         plt.legend()
         plt.xlabel("Iteration")
         plt.grid(True)

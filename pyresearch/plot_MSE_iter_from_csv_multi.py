@@ -81,7 +81,7 @@ def main():
     ax1.plot(mse3, "b-", alpha=0.5, label="RLS")
     ax1.set_ylim(-80, 5)
     ax1.set_ylabel("MSE [dB]")
-    ax1.set_xlabel("iteration")
+    ax1.set_xlabel("Sample")
     ax1.legend()
     plt.grid()
     plt.tight_layout()

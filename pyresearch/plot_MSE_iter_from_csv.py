@@ -94,7 +94,7 @@ def main():
 
     ax1 = fig.add_subplot(111)
     ax1.set_ylabel("MSE [dB]")
-    ax1.set_xlabel("iteration")
+    ax1.set_xlabel("Sample")
     ax1.plot(mse, "y-", alpha=1.0)
     # ax1.set_yscale("log")
     plt.grid()

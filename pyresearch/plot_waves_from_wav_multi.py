@@ -64,7 +64,8 @@ def main():
 
         ax.plot(data)
         ax.set_ylim(-1, 1)
-        ax.set_xlabel("Iteration")
+        ax.set_xlabel("Sample")
+        ax.set_ylabel("Amplitude")
         plt.tight_layout()
         plt.grid()
 
