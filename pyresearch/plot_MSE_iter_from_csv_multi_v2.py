@@ -109,7 +109,7 @@ def main():
 
     ax.legend()
     ax.set_ylabel("MSE [dB]")
-    ax.set_xlabel("iteration")
+    ax.set_xlabel("Sample")
     ax.set_ylim(-80, 5)
 
     plt.tight_layout()

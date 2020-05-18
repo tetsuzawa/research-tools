@@ -35,6 +35,21 @@ func ReadDataFromCSV(inputPath string) (ds []float64, ys []float64, es []float64
 	return ds, ys, es
 }
 
+func ReadDataFromCSVOne(inputPath string, column int) (fs []float64) {
+	fr, err := os.Open(inputPath)
+	check(err)
+	sc := bufio.NewScanner(fr)
+	var ss []string
+	var f float64
+	for sc.Scan() {
+		ss = strings.Split(sc.Text(), ",")
+		f, err = strconv.ParseFloat(ss[column], 64)
+		check(err)
+		fs = append(fs, f)
+	}
+	return fs
+}
+
 func ReadCoefFromCSV(inputPath string) (ws []float64) {
 	fr, err := os.Open(inputPath)
 	check(err)
@@ -122,6 +137,23 @@ func SaveDataAsCSV(d, y, e, mse []float64, dataDir string, testName string) {
 	check(err)
 	err = fw.Close()
 	check(err)
+}
+
+func SaveDataAsCSVOne(fs []float64, dataDir string, testName string) {
+	n := len(fs)
+	fw, err := os.Create(filepath.Join(dataDir, testName+".csv"))
+	check(err)
+	writer := bufio.NewWriter(fw)
+	for i := 0; i < n; i++ {
+		_, err = fmt.Fprintf(writer, "%g\n", fs[i])
+		check(err)
+	}
+	err = writer.Flush()
+	check(err)
+	err = fw.Close()
+	check(err)
+
+	fmt.Printf("output file is saved at: %v\n", testName+".csv")
 }
 
 func SplitPathAndExt(path string) (string, string) {

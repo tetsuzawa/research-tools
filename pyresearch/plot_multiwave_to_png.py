@@ -5,18 +5,20 @@
 #   python3 plot_multiwave.py foo.wav
 # then you can see the wave's abstruct
 
+import pathlib
 import signal
 import sys
 
-import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import soundfile as sf
+
+# import matplotlib
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 plt.rcParams['font.family'] = 'IPAPGothic'
-plt.rcParams['font.size'] = 11
+plt.rcParams['font.size'] = 16
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
@@ -39,16 +41,23 @@ def main():
         sys.exit()
 
     for i in range(len(args) - 1):
-        data, sr = sf.read(args[i + 1])
+        input_path = args[i + 1]
+        data, sr = sf.read(input_path)
 
-        plt.plot(data, alpha=0.5, label=args[i + 1])
+        input_path = pathlib.Path(input_path)
+
+        plt.plot(data, alpha=0.5, label=input_path.stem)
         plt.xlabel("Sample")
         plt.ylabel("Amplitude")
         plt.legend()
-        plt.xlabel("Iteration")
-        plt.grid(True)
+        plt.tight_layout()
+        plt.grid()
 
+    output_name = input_path.with_suffix(".png")
+    output_path = output_name.name
+    plt.savefig(output_path)
     plt.show()
+    print("\n plot is saved at: ", output_path, "\n")
 
 
 if __name__ == '__main__':
