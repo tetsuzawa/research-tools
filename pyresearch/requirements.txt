@@ -42,7 +42,7 @@ nbconvert==5.5.0
 nbformat==4.4.0
 notebook==6.0.0
 numba==0.45.0
-numpy==1.16.4
+numpy==1.21.0
 numpy-quaternion==2019.7.23.15.26.49
 octave-kernel==0.31.0
 padasip==1.1.1
